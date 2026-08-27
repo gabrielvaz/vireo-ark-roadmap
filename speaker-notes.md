@@ -112,4 +112,4 @@ Frame these as cheap: each is a question to Engineering or to a clinical validat
 
 ## Closing
 
-This slide stays projected through the questions. The question I leave open for the room: which prioritisation criteria matter most in your own daily practice?
+This slide stays projected through the questions, so it has to read as the roadmap and not as a summary: four pillars, one next version, and that is what the event sees. The question I leave open for the room: which prioritisation criteria matter most in your own daily practice?
