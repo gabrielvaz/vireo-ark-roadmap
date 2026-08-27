@@ -1,0 +1,1134 @@
+/* ============================================================================
+   Cardioline — design system de apresentação
+   Palco fixo 1280x720. Todos os valores vêm de references/brand.md.
+   Não editar tokens por deck: use as classes utilitárias ou adicione um
+   <style> no deck para regras exclusivas daquele deck.
+   ========================================================================= */
+
+/* ---------- fontes (self-hosted, variáveis) ------------------------------ */
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter-latin.woff2") format("woff2-variations"),
+       url("assets/fonts/Inter-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("assets/fonts/PlusJakartaSans-latin.woff2") format("woff2-variations"),
+       url("assets/fonts/PlusJakartaSans-latin.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: block;
+}
+
+/* ---------- tokens ------------------------------------------------------- */
+:root {
+  /* paleta oficial (awb-color1..8 de cardioline.com) */
+  --c-bg:          #FFFFFF;
+  --c-tint-blue:   #F1F4FE;
+  --c-tint-red:    #FFE0E0;
+  --c-tint-orange: #FDEBE0;
+  --c-primary:     #EE5B00;
+  --c-ink:         #071046;
+  --c-accent:      #AB8ED3;
+  --c-logo:        #F66201;
+
+  /* derivados */
+  --c-primary-08: color-mix(in srgb, var(--c-primary)  8%, #fff);
+  --c-primary-16: color-mix(in srgb, var(--c-primary) 16%, #fff);
+  --c-primary-40: color-mix(in srgb, var(--c-primary) 40%, #fff);
+  --c-ink-04:     color-mix(in srgb, var(--c-ink)  4%, #fff);
+  --c-ink-44:     color-mix(in srgb, var(--c-ink) 44%, #fff);  /* só decoração */
+  /* menor cinza que passa AA (4.56:1) sobre branco — use em legenda e rodapé */
+  --c-ink-58:     color-mix(in srgb, var(--c-ink) 58%, #fff);
+  --c-ink-64:     color-mix(in srgb, var(--c-ink) 64%, #fff);
+  --c-line:       color-mix(in srgb, var(--c-ink) 12%, #fff);
+  --c-line-strong:color-mix(in srgb, var(--c-ink) 22%, #fff);
+  --c-on-dark:    #FFFFFF;
+  --c-on-dark-64: rgba(255, 255, 255, .74);
+  --c-on-dark-44: rgba(255, 255, 255, .52);
+  /* laranja clareada — o único laranja legível sobre navy (7.99:1) */
+  --c-primary-up: #FF9052;
+  /* O laranja da marca dá 3.42:1 sobre branco: passa em texto grande, reprova
+     em texto pequeno. Este é o mesmo matiz escurecido até 5.37:1 (branco),
+     4.63:1 (tint laranja) e 4.88:1 (tint frio). Use em TODO texto abaixo de
+     24px; #EE5B00 fica para título, número grande, preenchimento e barra. */
+  --c-primary-ink: #B84600;
+
+  /* tipografia */
+  --ff-sans:    "Inter", Arial, Helvetica, sans-serif;
+  --ff-display: "Plus Jakarta Sans", "Inter", Arial, Helvetica, sans-serif;
+
+  --fs-display: 68px;
+  --fs-h1:      52px;
+  --fs-h2:      38px;
+  --fs-h3:      21px;
+  --fs-lead:    22px;
+  --fs-body:    17px;
+  --fs-small:   14.5px;
+  --fs-eyebrow: 12.5px;
+  --fs-caption: 12px;
+  --fs-metric:  56px;
+
+  /* palco e grid */
+  --stage-w: 1280px;
+  --stage-h: 720px;
+  --pad-x:   72px;
+  --pad-top: 104px;
+  --pad-bot: 76px;
+  --col:     70.667px;
+  --gutter:  24px;
+  --gap:     24px;
+  --gap-lg:  40px;
+
+  /* marca no header */
+  --logo-w: 132px;
+  --logo-x: 44px;
+  --logo-y: 30px;
+
+  /* forma */
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --radius-tile: 12px;
+  --shadow-card:  0 1px 2px rgba(7, 16, 70, .04);
+  --shadow-float: 0 12px 32px rgba(7, 16, 70, .10);
+
+  /* preenchidos pelo build.mjs com data-URIs */
+  --logo-orange: url("assets/brand/logo-orange.svg");
+  --logo-white:  url("assets/brand/logo-white.svg");
+  --logo-navy:   url("assets/brand/logo-navy.svg");
+}
+
+/* Pré-carga dos logos. O Chrome não busca `background-image` de elemento em
+   `display:none` — e só um slide fica visível. Sem isto, o logo usado apenas
+   em slides inativos (o branco) chega vazio no PDF. Ver também o preload em
+   deck.js e a embutição em data-URI feita pelo build.mjs. */
+.logo-preload {
+  position: fixed; top: -20px; left: -20px;
+  width: 2px; height: 2px; opacity: .01; pointer-events: none; z-index: -1;
+}
+.logo-preload > i { display: block; width: 2px; height: 2px; background-size: contain; }
+.logo-preload > i:nth-child(1) { background-image: var(--logo-orange); }
+.logo-preload > i:nth-child(2) { background-image: var(--logo-white); }
+.logo-preload > i:nth-child(3) { background-image: var(--logo-navy); }
+@media print { .logo-preload { display: none !important; } }
+
+/* ---------- reset ------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: #0B1020;
+  color: var(--c-ink);
+  font-family: var(--ff-sans);
+  font-size: var(--fs-body);
+  font-weight: 450;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+img, svg { max-width: 100%; display: block; }
+h1, h2, h3, h4, p, ul, ol, figure, blockquote { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+
+/* ============================================================================
+   PALCO
+   .deck   → viewport
+   .slide  → um slide; só o .is-active fica visível
+   .stage  → caixa fixa 1280x720, escalada por --scale
+   ========================================================================= */
+.deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+
+.slide { position: absolute; inset: 0; display: none; place-items: center; }
+.slide.is-active { display: grid; }
+
+.stage {
+  position: relative;
+  width: var(--stage-w);
+  height: var(--stage-h);
+  flex: 0 0 auto;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  overflow: hidden;
+  transform: scale(var(--scale, 1));
+  transform-origin: center center;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bot);
+  display: grid;
+  align-content: start;
+  gap: var(--gap-lg);
+}
+
+/* ---------- header: logo -------------------------------------------------- */
+.stage::before {
+  content: "";
+  position: absolute;
+  top: var(--logo-y);
+  left: var(--logo-x);
+  width: var(--logo-w);
+  aspect-ratio: 600 / 38;
+  background-image: var(--logo-orange);
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: contain;
+  z-index: 4;
+}
+.slide[data-logo="off"] .stage::before { display: none; }
+
+/* ---------- rodapé: paginação + kicker ------------------------------------ */
+.stage > .ft {
+  position: absolute;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  font-size: var(--fs-caption);
+  font-weight: 550;
+  letter-spacing: .04em;
+  color: var(--c-ink-58);
+  z-index: 3;
+}
+.ft .ft-num { font-variant-numeric: tabular-nums; }
+.slide[data-footer="off"] .ft { display: none; }
+
+/* ============================================================================
+   TONS DE FUNDO
+   ========================================================================= */
+.tone-dark .stage  { background: var(--c-ink);        color: var(--c-on-dark); }
+.tone-primary .stage { background: var(--c-primary);  color: var(--c-on-dark); }
+.tone-tint .stage  { background: var(--c-tint-orange); }
+.tone-cool .stage  { background: var(--c-tint-blue); }
+
+.tone-dark .stage::before,
+.tone-primary .stage::before { background-image: var(--logo-white); }
+.tone-tint .stage::before,
+.tone-cool .stage::before    { background-image: var(--logo-orange); }
+
+.tone-dark  h1, .tone-dark  h2, .tone-dark  h3,
+.tone-primary h1, .tone-primary h2, .tone-primary h3 { color: var(--c-on-dark); }
+.tone-dark  p, .tone-dark  li,
+.tone-primary p, .tone-primary li { color: var(--c-on-dark-64); }
+.tone-dark .eyebrow { color: var(--c-primary-up); }
+.tone-dark .ft { color: var(--c-on-dark-44); }
+.tone-dark .caption { color: var(--c-on-dark-44); }
+
+/* Sobre laranja, branco dá 3.42:1 — só serve para texto grande (>=24px).
+   Todo texto pequeno vira navy, que dá 5.23:1 sobre o laranja da marca. */
+.tone-primary .eyebrow,
+.tone-primary .ft,
+.tone-primary .caption,
+.tone-primary .note,
+.tone-primary .small { color: var(--c-ink); }
+.tone-primary .lead { color: var(--c-on-dark); font-size: 26px; }
+.tone-primary p:not(.lead):not(.eyebrow):not(.caption):not(.note),
+.tone-primary li { color: var(--c-ink); }
+.tone-dark .hr, .tone-primary .hr { background: rgba(255, 255, 255, .18); }
+.tone-dark .card, .tone-primary .card {
+  background: rgba(255, 255, 255, .07);
+  border-color: rgba(255, 255, 255, .16);
+}
+
+/* ============================================================================
+   TIPOGRAFIA
+   ========================================================================= */
+.eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: 750;
+  letter-spacing: .16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--c-primary-ink);
+}
+
+h1 {
+  font-family: var(--ff-display);
+  font-size: var(--fs-h1);
+  font-weight: 800;
+  letter-spacing: -.028em;
+  /* 1.12 é o mínimo: abaixo disso as linhas se sobrepõem e os acentos
+     (É, ú, ã) são cortados pela linha de cima. */
+  line-height: 1.12;
+  word-spacing: .04em;
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+h2 {
+  font-family: var(--ff-display);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  letter-spacing: -.022em;
+  line-height: 1.18;
+  word-spacing: .03em;
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 700;
+  letter-spacing: -.012em;
+  line-height: 1.28;
+  color: var(--c-ink);
+}
+h4 {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  letter-spacing: -.004em;
+  line-height: 1.35;
+  color: var(--c-ink);
+}
+
+p, li { color: var(--c-ink-64); line-height: 1.62; }
+.lead {
+  font-size: var(--fs-lead);
+  font-weight: 500;
+  letter-spacing: -.006em;
+  line-height: 1.5;
+  color: var(--c-ink-64);
+  max-width: 62ch;
+}
+.small   { font-size: var(--fs-small); line-height: 1.55; }
+.caption { font-size: var(--fs-caption); line-height: 1.5; color: var(--c-ink-58); letter-spacing: .01em; }
+
+/* Ênfase — a única forma aprovada de laranja em texto.
+   Em corpo usa o laranja escurecido; em display, o laranja da marca. */
+.hl, em, strong.hl { color: var(--c-primary-ink); font-style: normal; }
+h1 .hl, h1 em, h2 .hl, h2 em, .quote .hl, .quote em,
+.m-val .hl, .m-val em { color: var(--c-primary); }
+strong { color: var(--c-ink); font-weight: 700; }
+.tone-dark strong, .tone-primary strong { color: var(--c-on-dark); }
+
+/* ============================================================================
+   BLOCOS
+   ========================================================================= */
+
+/* pilha padrão de cabeçalho de slide: eyebrow + h2 (+ lead) */
+.head { display: grid; gap: 14px; align-content: start; }
+.head .eyebrow + h2 { margin-top: -2px; }
+
+/* corpo: recebe o conteúdo abaixo do .head */
+/* Quando o palco tem cabeçalho + corpo, o corpo ocupa a altura restante e
+   centra o conteúdo nela — sem isso todo slide curto fica com um vazio no pé. */
+.stage:has(> .head):has(> .body) { grid-template-rows: auto minmax(0, 1fr); }
+.body { display: grid; gap: var(--gap); align-content: center; min-height: 0; }
+.body.is-top { align-content: start; }
+
+/* grids */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.split  { display: grid; grid-template-columns: 1fr 1fr;       gap: var(--gap-lg); align-items: center; }
+.split-wide { display: grid; grid-template-columns: 1.25fr .75fr; gap: var(--gap-lg); align-items: center; }
+.split-narrow { display: grid; grid-template-columns: .75fr 1.25fr; gap: var(--gap-lg); align-items: center; }
+
+/* card */
+.card {
+  background: var(--c-bg);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 22px 24px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.card > p { font-size: var(--fs-small); }
+.card.is-tint  { background: var(--c-tint-orange); border-color: transparent; }
+.card.is-cool  { background: var(--c-tint-blue);   border-color: transparent; }
+.card.is-alert { background: var(--c-tint-red);    border-color: transparent; }
+.card.is-mark  { border-color: var(--c-primary); }
+.card.is-ink   { background: var(--c-ink); border-color: transparent; }
+.card.is-ink h3, .card.is-ink h4 { color: var(--c-on-dark); }
+.card.is-ink p, .card.is-ink li  { color: var(--c-on-dark-64); }
+
+/* pílula / tag */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  width: max-content;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--c-primary-08);
+  color: var(--c-primary-ink);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+/* navy sobre laranja dá 5.23:1 — branco sobre laranja dá 3.42:1 e reprova
+   em texto pequeno. Por isso a pílula sólida leva texto navy. */
+.pill.is-solid { background: var(--c-primary); color: var(--c-ink); }
+.pill.is-quiet { background: var(--c-ink-04); color: var(--c-ink-64); }
+.tag {
+  font-size: var(--fs-caption);
+  font-weight: 750;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--c-primary-ink);
+}
+
+/* numeral / ícone em quadrado */
+.tile {
+  width: 34px; height: 34px; flex: 0 0 34px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-tile);
+  background: var(--c-tint-orange);
+  color: var(--c-primary-ink);
+  font-size: var(--fs-small);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.tile.is-solid { background: var(--c-primary); color: var(--c-ink); }
+.tile.is-lg { width: 44px; height: 44px; flex-basis: 44px; font-size: 18px; }
+
+/* listagem */
+.list { display: grid; gap: 16px; }
+.list > li { display: grid; grid-template-columns: 34px 1fr; gap: 16px; align-items: start; }
+.list > li > .tile { margin-top: 1px; }
+.list .li-body { display: grid; gap: 4px; }
+.list .li-body p { font-size: var(--fs-small); }
+
+/* listagem simples com marcador */
+.bullets { display: grid; gap: 13px; }
+.bullets > li { position: relative; padding-left: 24px; }
+.bullets > li::before {
+  content: ""; position: absolute; left: 2px; top: .62em;
+  width: 7px; height: 7px; border-radius: 2px; background: var(--c-primary);
+}
+
+/* KPI */
+.metrics { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--gap); }
+.metric { display: grid; gap: 6px; align-content: start; }
+.metric .m-val {
+  font-family: var(--ff-display);
+  font-size: var(--fs-metric);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1;
+  color: var(--c-primary);
+}
+.metric .m-val .m-unit { font-size: .44em; font-weight: 700; letter-spacing: -.01em; }
+.metric .m-label { font-size: var(--fs-small); font-weight: 650; color: var(--c-ink); }
+.metric .m-note  { font-size: var(--fs-caption); color: var(--c-ink-58); }
+.metric.is-hero .m-val { font-size: 92px; }
+.metric.is-ink .m-val  { color: var(--c-ink); }
+.tone-dark .metric .m-val, .tone-primary .metric .m-val { color: var(--c-on-dark); }
+.tone-dark .metric .m-label { color: var(--c-on-dark); }
+
+/* passos / timeline */
+.steps { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 18px; }
+.steps > .step { position: relative; display: grid; gap: 12px; align-content: start; }
+.steps > .step > .tile { position: relative; z-index: 1; }
+.steps > .step p { font-size: var(--fs-small); }
+/* conector desenhado por passo: o último não desenha, então nada sobra na borda */
+.steps > .step::after {
+  content: ""; position: absolute; left: 44px; right: -18px; top: 16px;
+  height: 2px; background: var(--c-primary-16); z-index: 0;
+}
+.steps > .step:last-child::after { display: none; }
+
+.steps.is-vertical { grid-auto-flow: row; grid-auto-columns: auto; gap: 22px; }
+.steps.is-vertical > .step { grid-template-columns: 44px 1fr; gap: 18px; align-items: start; }
+.steps.is-vertical > .step::after {
+  left: 21px; right: auto; top: 54px; bottom: -22px; width: 2px; height: auto;
+}
+
+/* tabela */
+.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--fs-small); }
+.tbl thead th {
+  text-align: left;
+  padding: 13px 18px;
+  font-size: var(--fs-caption);
+  font-weight: 750;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--c-ink-64);
+  background: var(--c-ink-04);
+  border-bottom: 1px solid var(--c-line);
+}
+.tbl thead th:first-child { border-top-left-radius: var(--radius-card); }
+.tbl thead th:last-child  { border-top-right-radius: var(--radius-card); }
+.tbl tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--c-line);
+  color: var(--c-ink-64);
+  vertical-align: top;
+}
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tbody td:first-child { font-weight: 650; color: var(--c-ink); }
+.tbl tbody tr.is-mark td { background: var(--c-tint-orange); color: var(--c-ink); }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tbl-wrap {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* comparação */
+.compare { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--gap); }
+.compare > .col {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-card);
+  padding: 22px 24px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.compare > .col.is-mark { border-color: var(--c-primary); background: var(--c-tint-orange); }
+.compare .col-head { display: grid; gap: 4px; }
+
+/* barras (gráfico nativo) */
+.bars { display: grid; gap: 14px; }
+.bars > .bar-row {
+  display: grid; grid-template-columns: 190px 1fr 78px;
+  gap: 16px; align-items: center;
+  font-size: var(--fs-small);
+}
+.bars .bar-label { font-weight: 600; color: var(--c-ink); }
+.bars .bar-track { height: 16px; border-radius: var(--radius-pill); background: var(--c-primary-16); overflow: hidden; }
+.bars .bar-fill  { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--c-primary); }
+.bars .bar-row.is-quiet .bar-fill { background: var(--c-line-strong); }
+.bars .bar-val { text-align: right; font-weight: 700; color: var(--c-ink); font-variant-numeric: tabular-nums; }
+
+/* infográfico / diagrama */
+.flow { display: grid; grid-auto-flow: column; align-items: center; gap: 0; }
+.flow > .node {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-card);
+  background: var(--c-bg);
+  padding: 18px 20px;
+  display: grid; gap: 6px;
+  box-shadow: var(--shadow-card);
+}
+.flow > .node.is-mark { border-color: var(--c-primary); background: var(--c-tint-orange); }
+.flow > .arrow {
+  height: 2px; background: var(--c-primary-40); position: relative; min-width: 34px;
+}
+.flow > .arrow::after {
+  content: ""; position: absolute; right: -1px; top: -5px;
+  border-left: 9px solid var(--c-primary-40);
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+}
+.flow.is-vertical { grid-auto-flow: row; justify-items: stretch; }
+.flow.is-vertical > .arrow { width: 2px; height: 28px; min-width: 0; justify-self: center; }
+.flow.is-vertical > .arrow::after {
+  right: auto; left: -5px; top: auto; bottom: -1px;
+  border-left: 6px solid transparent; border-right: 6px solid transparent;
+  border-top: 9px solid var(--c-primary-40); border-bottom: 0;
+}
+
+/* matriz 2x2 */
+.matrix {
+  display: grid; grid-template-columns: 150px 1fr 1fr; grid-template-rows: 56px 1fr 1fr;
+  border: 1px solid var(--c-line); border-radius: var(--radius-card); overflow: hidden;
+  box-shadow: var(--shadow-card); font-size: var(--fs-small);
+}
+.matrix > * {
+  padding: 16px 18px; display: flex; align-items: center;
+  border-right: 1px solid var(--c-line); border-bottom: 1px solid var(--c-line);
+  color: var(--c-ink-64);
+}
+.matrix > .mx-head { background: var(--c-ink-04); font-weight: 700; color: var(--c-ink); }
+.matrix > .mx-axis {
+  background: var(--c-bg); font-size: var(--fs-caption); font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--c-ink-58);
+}
+.matrix > .mx-mark { background: var(--c-tint-orange); color: var(--c-ink); font-weight: 600; }
+
+/* par chave-valor */
+.kv { display: grid; gap: 12px; }
+.kv > div { display: grid; grid-template-columns: 160px 1fr; gap: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--c-line); }
+.kv > div:last-child { border-bottom: 0; padding-bottom: 0; }
+.kv dt { font-size: var(--fs-caption); font-weight: 750; letter-spacing: .1em; text-transform: uppercase; color: var(--c-ink-58); padding-top: 3px; }
+.kv dd { margin: 0; font-size: var(--fs-small); color: var(--c-ink); }
+
+/* citação */
+.quote {
+  font-family: var(--ff-display);
+  font-size: 34px; font-weight: 700; letter-spacing: -.018em; line-height: 1.26;
+  color: var(--c-ink); max-width: 24ch; text-wrap: balance;
+}
+.quote-attr { display: flex; align-items: center; gap: 12px; font-size: var(--fs-small); color: var(--c-ink-58); }
+.quote-attr::before { content: ""; width: 28px; height: 2px; background: var(--c-primary); flex: 0 0 28px; }
+.tone-dark .quote { color: var(--c-on-dark); }
+
+/* imagem de equipamento */
+.device { display: grid; place-items: center; }
+.device img { width: 100%; height: auto; object-fit: contain; }
+.device.is-framed {
+  border: 1px solid var(--c-line); border-radius: var(--radius-card);
+  background: var(--c-bg); padding: 26px;
+}
+.device.is-tint { background: var(--c-tint-orange); border-radius: var(--radius-card); padding: 26px; }
+.figure { display: grid; gap: 10px; justify-items: stretch; }
+.figure figcaption { font-size: var(--fs-caption); color: var(--c-ink-58); text-align: center; }
+.figure.is-left figcaption { text-align: left; }
+
+/* Sobre fundo tingido o cinza de 58% cai para 3.94:1 — sobe para 64%. */
+.tone-tint .caption, .tone-cool .caption, .tone-tint .note, .tone-cool .note,
+.card.is-tint .caption, .card.is-cool .caption, .card.is-alert .caption,
+.tone-tint .ft, .tone-cool .ft, .tone-tint .kv dt, .tone-cool .kv dt,
+.tone-tint .figure figcaption, .tone-cool .figure figcaption { color: var(--c-ink-64); }
+
+/* nota / fonte no pé do conteúdo */
+.note {
+  font-size: var(--fs-caption); color: var(--c-ink-58);
+  padding-top: 4px;
+}
+.note.is-box {
+  padding: 14px 18px; border-radius: 14px; background: var(--c-ink-04);
+  color: var(--c-ink-64); font-size: var(--fs-small);
+}
+
+/* ============================================================================
+   TEMPLATES DE SLIDE
+   Cada .t-* só ajusta o layout do palco. O conteúdo usa os blocos acima.
+   ========================================================================= */
+
+/* 1. capa ---------------------------------------------------------------- */
+.t-cover .stage {
+  align-content: center;
+  justify-items: start;
+  gap: 26px;
+  padding: var(--pad-x);
+}
+.t-cover .cover-mark {
+  width: 288px; aspect-ratio: 600 / 38;
+  background-image: var(--logo-orange);
+  background-repeat: no-repeat; background-position: left center; background-size: contain;
+  margin-bottom: 14px;
+}
+.t-cover.tone-dark .cover-mark, .t-cover.tone-primary .cover-mark { background-image: var(--logo-white); }
+.t-cover h1 { font-size: var(--fs-display); letter-spacing: -.032em; max-width: 20ch; }
+.t-cover .lead { max-width: 54ch; }
+.t-cover .cover-meta {
+  display: flex; gap: 28px; align-items: baseline;
+  margin-top: 12px; font-size: var(--fs-small); color: var(--c-ink-58);
+}
+.t-cover .cover-meta b { color: var(--c-ink); font-weight: 650; }
+.t-cover.tone-dark .cover-meta b { color: var(--c-on-dark); }
+/* .t-cover.is-split → texto à esquerda, equipamento à direita */
+.t-cover.is-split .stage { grid-template-columns: 1.05fr .95fr; align-items: center; column-gap: var(--gap-lg); }
+.t-cover.is-split .cover-text { display: grid; gap: 22px; justify-items: start; align-content: center; }
+.t-cover.is-split .cover-visual { display: grid; place-items: center; }
+.t-cover.is-split h1 { font-size: 54px; max-width: 18ch; }
+
+/* 2. divisória entre temas ---------------------------------------------- */
+.t-section .stage { align-content: center; justify-items: start; gap: 18px; padding: var(--pad-x); }
+.t-section .sec-num {
+  font-family: var(--ff-display);
+  font-size: 15px; font-weight: 800; letter-spacing: .2em;
+  color: var(--c-primary-ink);
+}
+.t-section.tone-dark .sec-num { color: var(--c-primary-up); }
+.t-section.tone-primary .sec-num { color: rgba(255, 255, 255, .78); }
+.t-section h1 { max-width: 22ch; }
+.t-section .lead { max-width: 56ch; }
+
+/* 3. agenda / sumário --------------------------------------------------- */
+.t-agenda .body { grid-template-columns: 1fr 1fr; gap: 2px var(--gap-lg); align-content: center; }
+.t-agenda .ag-item {
+  display: grid; grid-template-columns: 34px 1fr auto; gap: 16px; align-items: center;
+  padding: 19px 0; border-bottom: 1px solid var(--c-line);
+}
+.t-agenda .ag-item:last-child, .t-agenda .ag-item:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+.t-agenda .ag-item h3 { font-size: 17px; }
+.t-agenda .ag-item .ag-num { font-size: var(--fs-caption); color: var(--c-ink-58); font-variant-numeric: tabular-nums; }
+.t-agenda .ag-item.is-current { border-bottom-color: var(--c-primary); }
+.t-agenda .ag-item.is-current h3 { color: var(--c-primary-ink); }
+
+/* 4. frase de impacto --------------------------------------------------- */
+.t-statement .stage { align-content: center; justify-items: center; text-align: center; gap: 22px; padding: var(--pad-x) 120px; }
+.t-statement h1 { font-size: 58px; max-width: 26ch; }
+.t-statement .lead { max-width: 60ch; text-align: center; }
+
+/* 5. listagem ----------------------------------------------------------- */
+.t-list .body { grid-template-columns: 1fr; }
+.t-list.is-2col .list { grid-template-columns: 1fr 1fr; gap: 18px var(--gap-lg); }
+.t-list.is-2col .list { display: grid; }
+
+/* 6. cards -------------------------------------------------------------- */
+.t-cards .body > .grid-2 > .card,
+.t-cards .body > .grid-3 > .card { min-height: 178px; }
+.t-cards .body > .grid-4 > .card { min-height: 168px; padding: 20px; }
+
+/* 7. KPI ---------------------------------------------------------------- */
+.t-metrics .body { gap: var(--gap-lg); }
+
+/* 8. passos / processo -------------------------------------------------- */
+/* usa .steps — sem override */
+
+/* 9. tabela ------------------------------------------------------------- */
+.t-table .body { gap: 16px; }
+
+/* 10. comparação -------------------------------------------------------- */
+/* usa .compare — sem override */
+
+/* 11. gráfico ----------------------------------------------------------- */
+.t-chart .chart-box {
+  border: 1px solid var(--c-line); border-radius: var(--radius-card);
+  padding: 26px 28px; box-shadow: var(--shadow-card);
+}
+.t-chart .chart-box svg { width: 100%; height: auto; display: block; }
+
+/* 12. texto + equipamento ---------------------------------------------- */
+.t-split .stage { align-content: center; }
+.t-split .split, .t-split .split-wide, .t-split .split-narrow { align-items: center; }
+.t-split .head { gap: 16px; }
+.t-split .col-text { display: grid; gap: 20px; align-content: center; }
+
+/* 13. imagem sangrada -------------------------------------------------- */
+.t-bleed .stage { padding: 0; align-content: stretch; }
+.t-bleed .bleed { position: relative; width: 100%; height: 100%; display: grid; }
+.t-bleed .bleed > img { width: 100%; height: 100%; object-fit: cover; }
+.t-bleed .bleed-panel {
+  position: absolute; inset: auto 0 0 0;
+  padding: 56px var(--pad-x) 48px;
+  background: linear-gradient(to top, rgba(7,16,70,.92) 0%, rgba(7,16,70,.72) 55%, rgba(7,16,70,0) 100%);
+  display: grid; gap: 12px;
+}
+.t-bleed .bleed-panel h2 { color: var(--c-on-dark); max-width: 26ch; }
+.t-bleed .bleed-panel p  { color: var(--c-on-dark-64); max-width: 60ch; }
+.t-bleed .bleed-panel .eyebrow { color: var(--c-primary-40); }
+.t-bleed .stage::before { background-image: var(--logo-white); }
+/* variante lateral: imagem ocupa metade, texto na outra */
+.t-bleed.is-side .stage {
+  padding: 0; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr;
+  align-content: stretch; gap: 0;
+}
+.t-bleed.is-side .bleed-half {
+  position: relative; overflow: hidden;
+  background: var(--c-tint-orange);
+  display: grid; place-items: center; padding: 44px;
+}
+/* renders de produto têm fundo transparente: contain é o padrão correto.
+   .is-cover é para fotografia de ambiente, que deve sangrar. */
+.t-bleed.is-side .bleed-half > img { width: 100%; height: 100%; object-fit: contain; }
+.t-bleed.is-side .bleed-half.is-cover { padding: 0; background: none; }
+.t-bleed.is-side .bleed-half.is-cover > img { object-fit: cover; }
+.t-bleed.is-side .panel-half { padding: var(--pad-top) 56px var(--pad-bot); display: grid; gap: 20px; align-content: center; }
+/* logo e rodapé não podem cair sobre a imagem */
+.t-bleed.is-side .stage::before { background-image: var(--logo-orange); left: calc(50% + 56px); }
+.t-bleed.is-side .ft { left: calc(50% + 56px); right: 56px; }
+
+/* 14. infográfico / diagrama ------------------------------------------ */
+.t-diagram .body { gap: var(--gap-lg); }
+.t-diagram .diagram-box { display: grid; gap: 20px; }
+
+/* 15. citação --------------------------------------------------------- */
+.t-quote .stage { align-content: center; }
+.t-quote .split-narrow { align-items: center; }
+
+/* 16. encerramento ---------------------------------------------------- */
+.t-end .stage { align-content: center; justify-items: start; gap: 24px; padding: var(--pad-x); }
+.t-end .end-mark {
+  width: 288px; aspect-ratio: 600 / 38;
+  background-image: var(--logo-white);
+  background-repeat: no-repeat; background-position: left center; background-size: contain;
+}
+.t-end.tone-white .end-mark { background-image: var(--logo-orange); }
+.t-end h1 { max-width: 24ch; }
+.t-end .end-contact { display: flex; gap: 34px; font-size: var(--fs-small); }
+.t-end .end-contact > div { display: grid; gap: 3px; }
+.t-end .end-contact dt { font-size: var(--fs-caption); letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.t-end .end-contact dd { margin: 0; color: var(--c-on-dark); font-weight: 600; }
+
+/* ============================================================================
+   UTILITÁRIOS
+   ========================================================================= */
+.stack   { display: grid; gap: var(--gap); align-content: start; }
+.stack-sm { display: grid; gap: 10px; align-content: start; }
+.stack-lg { display: grid; gap: var(--gap-lg); align-content: start; }
+.row     { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.row-sb  { display: flex; align-items: center; justify-content: space-between; gap: var(--gap); }
+.center  { text-align: center; justify-items: center; }
+.mt-auto { margin-top: auto; }
+.w-full  { width: 100%; }
+.hr      { height: 1px; background: var(--c-line); border: 0; }
+.max-56  { max-width: 56ch; }
+.max-64  { max-width: 64ch; }
+
+/* ============================================================================
+   HUD DE NAVEGAÇÃO  (não aparece no PDF/PPTX)
+   ========================================================================= */
+.hud {
+  position: fixed; right: 20px; bottom: 18px; z-index: 60;
+  display: flex; align-items: center; gap: 2px;
+  padding: 6px;
+  background: rgba(255, 255, 255, .9);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-float);
+  font-size: 13px;
+}
+.hud button {
+  border: 0; background: transparent; cursor: pointer;
+  padding: 7px 11px; border-radius: var(--radius-pill);
+  color: var(--c-ink-64); font-weight: 700; line-height: 1;
+}
+.hud button:hover { background: var(--c-tint-orange); color: var(--c-primary); }
+.hud .hud-count {
+  min-width: 74px; padding: 0 10px; text-align: center;
+  font-weight: 750; color: var(--c-ink); font-variant-numeric: tabular-nums;
+  cursor: pointer; border-radius: var(--radius-pill); border: 0; background: transparent;
+}
+.hud .hud-count:hover { background: var(--c-tint-orange); color: var(--c-primary); }
+
+/* barra de progresso */
+.progress {
+  position: fixed; left: 0; top: 0; height: 3px; z-index: 60;
+  background: var(--c-primary);
+  transition: width .22s ease;
+}
+
+/* campo "ir para slide" */
+.jump {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 80; display: none;
+  padding: 26px 30px; border-radius: 22px;
+  background: rgba(255, 255, 255, .97);
+  border: 1px solid var(--c-line);
+  box-shadow: var(--shadow-float);
+  text-align: center;
+}
+.jump.is-open { display: block; }
+.jump label { display: block; font-size: var(--fs-caption); letter-spacing: .12em; text-transform: uppercase; color: var(--c-ink-58); margin-bottom: 10px; }
+.jump input {
+  width: 160px; padding: 10px 14px; text-align: center;
+  font-family: var(--ff-display); font-size: 30px; font-weight: 800;
+  color: var(--c-ink); border: 1px solid var(--c-line-strong); border-radius: 14px;
+  outline: none; font-variant-numeric: tabular-nums;
+}
+.jump input:focus { border-color: var(--c-primary); }
+.jump .jump-hint { margin-top: 10px; font-size: var(--fs-caption); color: var(--c-ink-58); }
+
+/* grade de visão geral */
+.overview {
+  position: fixed; inset: 0; z-index: 70; display: none;
+  padding: 34px; overflow-y: auto;
+  background: rgba(7, 16, 70, .96);
+  backdrop-filter: blur(6px);
+}
+.overview.is-open { display: block; }
+.overview-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  color: #fff; margin-bottom: 22px;
+}
+.overview-head h4 { color: #fff; font-size: 15px; letter-spacing: .04em; }
+.overview-head span { font-size: var(--fs-caption); color: rgba(255,255,255,.5); }
+.overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+.ov-item {
+  display: grid; gap: 8px; cursor: pointer; border: 0; background: transparent;
+  padding: 0; text-align: left;
+}
+.ov-thumb {
+  aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden;
+  background: #fff; border: 2px solid rgba(255,255,255,.14);
+  display: grid; place-items: center; position: relative;
+}
+.ov-item.is-current .ov-thumb { border-color: var(--c-primary); }
+.ov-thumb .ov-mini {
+  width: 1280px; height: 720px; transform: scale(.164); transform-origin: center;
+  pointer-events: none; flex: 0 0 auto;
+}
+.ov-meta { display: flex; gap: 8px; align-items: baseline; font-size: var(--fs-caption); color: rgba(255,255,255,.62); }
+.ov-meta b { color: #fff; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ajuda */
+.help {
+  position: fixed; inset: 0; z-index: 90; display: none;
+  place-items: center; background: rgba(7, 16, 70, .82);
+}
+.help.is-open { display: grid; }
+.help-card {
+  background: #fff; border-radius: 22px; padding: 32px 36px;
+  box-shadow: var(--shadow-float); max-width: 460px; display: grid; gap: 16px;
+}
+.help-card h4 { font-size: 17px; }
+.help-card dl { display: grid; grid-template-columns: 128px 1fr; gap: 10px 18px; margin: 0; font-size: var(--fs-small); }
+.help-card dt { color: var(--c-ink-58); }
+.help-card dd { margin: 0; color: var(--c-ink); }
+.help-card kbd {
+  display: inline-block; padding: 2px 7px; margin-right: 3px;
+  border: 1px solid var(--c-line-strong); border-bottom-width: 2px; border-radius: 6px;
+  font-family: inherit; font-size: 12px; font-weight: 650; color: var(--c-ink);
+  background: var(--c-ink-04);
+}
+
+/* notas do orador */
+.notes { display: none; }
+.presenter .notes {
+  display: block;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+  max-height: 32vh; overflow-y: auto;
+  padding: 20px 26px 26px;
+  background: var(--c-ink); color: var(--c-on-dark-64);
+  font-size: var(--fs-small); line-height: 1.6;
+}
+.presenter .notes:not(.is-active) { display: none; }
+.presenter .notes b, .presenter .notes strong { color: #fff; }
+
+/* ============================================================================
+   IMPRESSÃO / EXPORTAÇÃO
+   Uma página por slide, exatamente 1280x720px, sem escala e sem HUD.
+   ========================================================================= */
+@page { size: 1280px 720px; margin: 0; }
+
+@media print {
+  html, body { width: 1280px; height: auto; overflow: visible; background: #fff; }
+  body { font-size: var(--fs-body); }
+  .deck { width: 1280px; height: auto; overflow: visible; }
+  .slide, .slide.is-active {
+    display: grid !important;
+    position: relative; inset: auto;
+    width: 1280px; height: 720px;
+    page-break-inside: avoid; break-inside: avoid;
+    page-break-after: always; break-after: page;
+    overflow: hidden;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .stage { transform: none !important; width: 1280px; height: 720px; }
+  .hud, .progress, .jump, .overview, .help, .notes { display: none !important; }
+  /* `*` não casa pseudo-elementos: sem estas duas linhas o Chrome descarta
+     fundos claros (o logo branco, entre outros) no modo de economia de tinta. */
+  *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* modo de captura usado pelo export-pptx (um slide por viewport, sem escala) */
+body.capture { overflow: visible; background: #fff; }
+body.capture .deck { width: 1280px; height: 720px; }
+body.capture .slide { display: none !important; }
+body.capture .slide.is-capture { display: grid !important; position: relative; inset: auto; }
+body.capture .stage { transform: none !important; }
+body.capture .hud, body.capture .progress, body.capture .jump,
+body.capture .overview, body.capture .help, body.capture .notes { display: none !important; }
+
+/* ============================================================================
+   ENTRADA PROGRESSIVA, CAMPOS AO VIVO E VESTIDO DE FOLHETO
+   Vindos do deck MindBeat (2026-08-20). Tudo aqui é opcional: um deck que não
+   usa estas classes continua idêntico ao que era antes.
+   ========================================================================= */
+
+:root {
+  --ease-out:   cubic-bezier(.22, 1, .36, 1);
+  --c-ink-deep: #040A2A;   /* navy mais fundo, só na moldura do vestido folheto */
+}
+
+/* ---- Entrada progressiva -----------------------------------------------------
+   Cada elemento com data-reveal entra sozinho, na ordem que --d define, a 130ms
+   por posição. O gatilho é .is-active, então a entrada se REPETE toda vez que se
+   volta ao slide: numa reunião a mesma passagem é mostrada mais de uma vez e
+   precisa funcionar igual na segunda. */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity   680ms var(--ease-out),
+    transform 680ms var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 130ms);
+}
+.slide.is-active [data-reveal] { opacity: 1; transform: none; }
+
+/* Logo e marca entram só aparecendo: deslocar um logo o faz parecer solto. */
+.cover-mark[data-reveal], .device[data-reveal] img { transform: none; }
+
+/* QA, export e impressão veem o slide inteiro, sem esperar animação. Sem isto o
+   PDF sai em branco e a folha de contato do qa.mjs mente. */
+body.capture [data-reveal],
+.slide.is-capture [data-reveal] {
+  opacity: 1 !important; transform: none !important; transition: none !important;
+}
+@media print {
+  [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---- Campos preenchidos ao vivo ---------------------------------------------
+   Texto que se digita durante a reunião (nome do cliente, contato, data) e
+   números que se varrem com slider para recalcular um resultado na frente de
+   quem decide. Nada persiste: recarregar volta ao padrão, de propósito, para o
+   deck começar limpo na reunião seguinte. */
+
+.editable {
+  border-bottom: 1.5px dashed var(--c-line-strong);
+  padding: 0 2px;
+  border-radius: 3px;
+  cursor: text;
+}
+.editable:hover { background: var(--c-primary-08); }
+.editable:focus {
+  outline: 0;
+  background: var(--c-tint-orange);
+  border-bottom-color: var(--c-primary);
+}
+.editable.is-accent { color: var(--c-primary-ink); font-weight: 600; }
+.tone-dark .editable, .tone-primary .editable { border-bottom-color: var(--c-on-dark-44); }
+.tone-dark .editable:focus, .tone-primary .editable:focus {
+  background: rgba(255, 255, 255, .12); border-bottom-color: var(--c-on-dark);
+}
+/* No PPTX o campo vira texto comum: o valor que estiver na tela é o exportado. */
+
+/* Um controle = rótulo + número + slider. Os dois entram no mesmo valor, porque
+   servem a públicos diferentes: o campo é para quem já sabe o número, o slider é
+   para varrer cenários ao vivo sem tirar os olhos do resultado. */
+.dials { display: grid; gap: 14px; }
+.dial { display: grid; grid-template-columns: 1fr 130px; gap: 6px 18px; align-items: center; }
+.dial > label { font-size: var(--fs-small); color: var(--c-ink-64); }
+.dial > input[type="number"] {
+  grid-column: 2;
+  font-family: var(--ff-display);
+  font-size: var(--fs-h3);
+  font-weight: 750;
+  text-align: right;
+  color: var(--c-ink);
+  background: var(--c-tint-orange);
+  border: 0;
+  border-bottom: 2px solid var(--c-primary);
+  border-radius: 6px 6px 0 0;
+  padding: 6px 12px;
+  -moz-appearance: textfield;
+}
+.dial > input[type="number"]::-webkit-outer-spin-button,
+.dial > input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.dial > input[type="range"] {
+  grid-column: 1 / -1;
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px; margin: 0;
+  background: var(--c-line); border-radius: 999px; cursor: pointer;
+}
+.dial > input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 999px;
+  background: var(--c-primary); border: 0; cursor: pointer;
+}
+.dial > input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 999px;
+  background: var(--c-primary); border: 0; cursor: pointer;
+}
+.dial > input:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 3px; }
+
+/* Saída do cálculo: rótulo tracked em caixa alta, número grande em laranja. */
+.outs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--gap); }
+/* Empilhado: usa-se quando o cálculo mora numa coluna estreita ao lado dos
+   controles, que é o que caiba num palco de 720px sem apertar. */
+.outs.is-stack { grid-auto-flow: row; grid-auto-columns: auto; gap: 20px; align-content: center; }
+.out > .o-label {
+  font-size: var(--fs-caption); font-weight: 750; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--c-ink-64);
+}
+/* Menor que .metric de propósito: aqui há duas ou três saídas lado a lado e o
+   valor é moeda, que é longa. Domina pela cor, não pelo corpo. */
+.out > .o-val {
+  font-family: var(--ff-display); font-size: var(--fs-h2); font-weight: 800;
+  letter-spacing: -.028em; line-height: 1.1; color: var(--c-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Peças da linguagem do folheto -----------------------------------------*/
+
+/* Traço laranja antes do eyebrow. É a marca gráfica mais reconhecível do deck
+   MindBeat, e a única decoração aprovada acima do título. */
+.eyebrow.has-dash { display: flex; align-items: center; gap: 14px; }
+.eyebrow.has-dash::before {
+  content: ""; width: 26px; height: 2px; flex: 0 0 auto;
+  background: var(--c-primary);
+}
+.tone-dark .eyebrow.has-dash::before, .tone-primary .eyebrow.has-dash::before {
+  background: var(--c-primary-up);
+}
+
+/* Filete laranja curto, para separar dois pensamentos dentro da mesma coluna. */
+/* margin: 0 anula a centralização que o navegador dá a <hr> por padrão. */
+.rule-accent { width: 80px; height: 2px; margin: 0; background: var(--c-primary); border: 0; }
+
+/* Imagem com a legenda DENTRO, sobre um véu escuro. Diferente de .figure, que
+   põe a legenda embaixo: aqui a foto e a frase são uma peça só. */
+.shot {
+  position: relative; overflow: hidden; border-radius: var(--radius-card);
+  background: var(--c-ink); display: grid; margin: 0;
+}
+.shot > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.shot > figcaption {
+  position: absolute; inset: auto 0 0 0; padding: 28px 30px;
+  background: linear-gradient(to top, rgba(4, 10, 42, .92) 30%, rgba(4, 10, 42, 0));
+  color: var(--c-on-dark);
+}
+.shot > figcaption > b { display: block; font-family: var(--ff-display); font-weight: 700;
+  font-size: var(--fs-h3); letter-spacing: -.012em; }
+.shot > figcaption > span { display: block; margin-top: 6px; font-size: var(--fs-small);
+  color: var(--c-on-dark-64); }
+
+/* Marcador de item verificado — círculo vazado em laranja. Usa-se quando a lista
+   afirma o que JÁ existe; para lista neutra continue com .bullets. */
+.bullets.is-check > li { padding-left: 34px; }
+.bullets.is-check > li::before {
+  content: ""; left: 0; top: .18em; width: 20px; height: 20px; border-radius: 999px;
+  background: none; border: 1.5px solid var(--c-primary);
+}
+.bullets.is-check > li::after {
+  content: ""; position: absolute; left: 6px; top: .52em;
+  width: 8px; height: 4px; border: 0 solid var(--c-primary);
+  border-left-width: 1.6px; border-bottom-width: 1.6px;
+  transform: rotate(-45deg);
+}
+
+/* Passos como chips vazados, com seta laranja entre eles. Alternativa ao
+   .steps padrão quando cada etapa é um nome curto e não um parágrafo. */
+.steps.is-chips { grid-auto-flow: column; gap: 0; align-items: stretch; }
+.steps.is-chips > .step {
+  position: relative;
+  display: grid; gap: 8px; align-content: start;
+  padding: 18px 20px;
+  border: 1px solid var(--c-line-strong);
+  border-radius: var(--radius-tile);
+}
+.steps.is-chips > .step:not(:last-child) { margin-right: 46px; }
+/* a seta vive na borda direita do chip, no vão que a margem abriu */
+.steps.is-chips > .step:not(:last-child)::after {
+  content: "\2192";
+  /* left: auto anula o `left: 44px` do conector padrão de .steps — sem isto o
+     elemento estica de dentro do chip até o vão e a seta cai sobre o texto. */
+  position: absolute; left: auto; right: -34px; top: 50%; transform: translateY(-50%);
+  width: auto; height: auto; background: none;
+  color: var(--c-primary); font-size: var(--fs-h3); font-weight: 700; line-height: 1;
+}
+.steps.is-chips > .step:last-child::after { display: none; }
+.steps.is-chips .s-num {
+  font-size: var(--fs-caption); font-weight: 750; letter-spacing: .1em;
+  color: var(--c-primary-ink);
+}
+.steps.is-chips .s-name { font-size: var(--fs-body); color: var(--c-ink); font-weight: 500; }
+
+/* Assinatura do grupo, para material que fala pelas três marcas. */
+.lockup-group {
+  font-size: var(--fs-eyebrow); font-weight: 750; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--c-ink-64);
+}
+.tone-dark .lockup-group, .tone-primary .lockup-group { color: var(--c-on-dark-64); }
+
+/* ---- Vestido de folheto ----------------------------------------------------
+   Uma linha no <body> escurece as três peças de moldura (capa, divisória e
+   encerramento) e liga o traço no eyebrow em todo o deck. O corpo do argumento
+   continua em branco: é o contraste entre os dois que faz a moldura funcionar. */
+
+/* O tom escuro em si é aplicado pelo deck.js, que põe .tone-dark nas três peças
+   de moldura: assim a skin reusa o sistema de tons inteiro (cor de texto, troca
+   do logo, contraste do rodapé) em vez de reimplementá-lo e divergir dele. Aqui
+   fica só o que a skin acrescenta. */
+body.skin-brochure .t-cover.tone-dark .stage,
+body.skin-brochure .t-section.tone-dark .stage,
+body.skin-brochure .t-end.tone-dark .stage { background: var(--c-ink-deep); }
+body.skin-brochure .eyebrow { display: flex; align-items: center; gap: 14px; }
+body.skin-brochure .eyebrow::before {
+  content: ""; width: 26px; height: 2px; flex: 0 0 auto; background: var(--c-primary);
+}
+body.skin-brochure .tone-dark .eyebrow::before { background: var(--c-primary-up); }

@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<title>VIREO ARK · The Next Version</title>
+<link rel="stylesheet" href="deck.css">
+<style>
+/* ============================================================================
+   Override de contraste, a pedido: todo texto sobre fundo laranja primário
+   sai em branco (--c-on-dark), como já acontece nos slides tone-primary.
+   Substitui o navy que o deck.css usa em .pill.is-solid e .tile.is-solid.
+   ========================================================================= */
+.pill.is-solid,
+.tile.is-solid { color: var(--c-on-dark); }
+</style>
+
+<style>
+/* ============================================================================
+   Deck-only rules: interface mock-ups drawn in HTML/CSS.
+   Every colour comes from deck.css tokens. No new palette values.
+   ========================================================================= */
+
+.mk {
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background: var(--c-bg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.mk-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  background: var(--c-ink-04);
+  border-bottom: 1px solid var(--c-line);
+}
+.mk-bar .mk-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-line-strong); }
+.mk-bar .mk-name {
+  font-size: 10.5px; font-weight: 750; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--c-ink-58);
+}
+.mk-bar .mk-right { margin-left: auto; font-size: 10.5px; font-weight: 600; color: var(--c-ink-58); }
+
+.mk-head, .mk-row {
+  display: grid;
+  grid-template-columns: var(--cols, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+}
+.mk-head {
+  background: var(--c-ink-04);
+  border-bottom: 1px solid var(--c-line);
+  font-size: 9.5px; font-weight: 750; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--c-ink-58);
+}
+.mk-row { border-bottom: 1px solid var(--c-line); font-size: 12px; color: var(--c-ink-58); }
+.mk-row:last-child { border-bottom: 0; }
+.mk-row b { color: var(--c-ink); font-weight: 600; }
+.mk-num { font-variant-numeric: tabular-nums; }
+
+.mk-tag {
+  display: inline-block;
+  font-size: 9px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: var(--radius-pill);
+  background: var(--c-ink-04); color: var(--c-ink-58);
+}
+.mk-tag.is-stat { background: var(--c-primary); color: var(--c-on-dark); }
+.mk-tag.is-ped  { background: var(--c-tint-blue); color: var(--c-ink); }
+.mk-tag.is-ai   { background: var(--c-tint-orange); color: var(--c-primary-ink); }
+
+/* Traçado de ECG: sem preserveAspectRatio="none", a proporção é preservada e
+   o desenho não distorce. O viewBox de cada uso já tem a proporção da caixa. */
+.mk-trace { display: block; width: 100%; height: 26px; }
+.mk-trace path { fill: none; stroke: var(--c-ink-58); stroke-width: 1.6; stroke-linejoin: round; }
+.mk-trace.is-crit path { stroke: var(--c-primary); stroke-width: 1.9; }
+
+.mk-band {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--c-line);
+  font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-ink-58);
+  background: var(--c-ink-04);
+}
+.mk-band.is-crit { background: var(--c-tint-red); color: var(--c-ink); }
+.mk-band .mk-band-n { margin-left: auto; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+.mk-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 11px 14px; }
+.mk-card {
+  display: grid; gap: 5px;
+  border: 1px solid var(--c-line); border-radius: 10px;
+  padding: 9px 11px;
+}
+.mk-card.is-crit { border-color: var(--c-primary); background: var(--c-bg); }
+.mk-card .mk-who { font-size: 12.5px; font-weight: 650; color: var(--c-ink); }
+.mk-card .mk-meta { font-size: 10.5px; color: var(--c-ink-58); }
+.mk-why { font-size: 10px; font-weight: 750; letter-spacing: .03em; color: var(--c-primary-ink); }
+
+.mk-origins { display: grid; gap: 9px; padding: 12px 14px; }
+.mk-origin {
+  display: grid; gap: 5px;
+  border: 1px solid var(--c-line); border-radius: 10px;
+  padding: 9px 12px;
+}
+.mk-origin.is-device { background: var(--c-ink-04); }
+.mk-origin.is-ai     { background: var(--c-tint-orange); border-color: var(--c-primary-40); }
+.mk-origin.is-human  { background: var(--c-bg); border-color: var(--c-line-strong); }
+.mk-src {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-ink-58);
+}
+.mk-origin.is-ai .mk-src { color: var(--c-primary-ink); }
+.mk-src .mk-lock { margin-left: auto; letter-spacing: .04em; font-weight: 700; }
+.mk-txt { font-size: 11.5px; line-height: 1.45; color: var(--c-ink); }
+.mk-txt.is-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; }
+.mk-ph { font-size: 11.5px; color: var(--c-ink-58); font-style: italic; }
+.mk-burden { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11px; color: var(--c-ink); }
+.mk-burden b { font-variant-numeric: tabular-nums; }
+
+.mk-roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: stretch; }
+.mk-role { display: grid; grid-template-rows: 1fr auto auto; gap: 8px; }
+.mk-role > .mk { min-height: 168px; }
+.mk-role-name { font-size: var(--fs-h3); font-weight: 700; color: var(--c-ink); letter-spacing: -.012em; }
+.mk-role-sub  { font-size: var(--fs-caption); color: var(--c-ink-58); line-height: 1.45; min-height: 2.9em; }
+.mk-mini { display: grid; gap: 6px; padding: 10px 11px; align-content: start; }
+.mk-mini .mk-lbl {
+  font-size: 8.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--c-primary-ink);
+}
+.mk-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mk-kpi { border: 1px solid var(--c-line); border-radius: 8px; padding: 6px 7px; display: grid; gap: 1px; }
+.mk-kpi b { font-size: 15px; font-weight: 800; color: var(--c-primary-ink); letter-spacing: -.02em;
+            font-variant-numeric: tabular-nums; line-height: 1.1; }
+.mk-kpi span { font-size: 8px; color: var(--c-ink-58); line-height: 1.25; }
+.mk-line { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--c-ink); }
+.mk-line i { width: 5px; height: 5px; border-radius: 50%; background: var(--c-primary); flex: 0 0 auto; }
+.mk-line.is-quiet { color: var(--c-ink-58); }
+.mk-line.is-quiet i { background: var(--c-line-strong); }
+.mk-btn {
+  display: inline-block; text-align: center;
+  font-size: 9.5px; font-weight: 750; letter-spacing: .04em;
+  padding: 6px 10px; border-radius: var(--radius-pill);
+  background: var(--c-primary); color: var(--c-on-dark);
+}
+.mk-btn.is-quiet { background: var(--c-ink-04); color: var(--c-ink-58); }
+
+.mk2 { display: grid; grid-template-columns: 1fr 1.32fr; gap: var(--gap-lg); align-items: center; }
+.mk2.is-even { grid-template-columns: 1fr 1fr; }
+.mk2.is-top { align-items: start; }
+.mk-cap { font-size: var(--fs-caption); color: var(--c-ink-58); margin-top: 10px; }
+.compare .mk { margin-top: 4px; }
+
+/* ---- chevrons no lugar das setas do HUD -------------------------------- */
+.hud button[data-act="prev"],
+.hud button[data-act="next"] { font-size: 0; position: relative; width: 34px; height: 30px; }
+.hud button[data-act="prev"]::before,
+.hud button[data-act="next"]::before {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: 8px; height: 8px;
+  border: solid currentColor; border-width: 2px 2px 0 0;
+  border-radius: 1px;
+}
+.hud button[data-act="prev"]::before { transform: translate(-35%, -50%) rotate(-135deg); }
+.hud button[data-act="next"]::before { transform: translate(-65%, -50%) rotate(45deg); }
+
+/* ---- motion ------------------------------------------------------------ */
+.mk-trace.is-draw path { stroke-dasharray: 1400; stroke-dashoffset: 1400; }
+.slide.is-active .mk-trace.is-draw path { animation: mk-draw 1700ms var(--ease-out) 420ms both; }
+@keyframes mk-draw { to { stroke-dashoffset: 0; } }
+
+.slide.is-active .mk-card.is-crit { animation: mk-pulse 2200ms var(--ease-out) 1100ms 3; }
+@keyframes mk-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(238, 91, 0, 0); }
+  45%      { box-shadow: 0 0 0 4px rgba(238, 91, 0, .16); }
+}
+
+body.capture .mk-trace.is-draw path,
+.slide.is-capture .mk-trace.is-draw path { animation: none; stroke-dashoffset: 0; }
+body.capture .mk-card.is-crit,
+.slide.is-capture .mk-card.is-crit { animation: none; }
+@media print {
+  .mk-trace.is-draw path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .mk-card.is-crit { animation: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-trace.is-draw path { animation: none; stroke-dashoffset: 0; }
+  .mk-card.is-crit { animation: none; }
+}
+</style>
+</head>
+<body data-lang="en">
+
+<div class="deck" id="deck" data-kicker="Cardioline · VIREO ARK · Confidential">
+
+<!-- 01 · COVER -->
+<section class="slide t-cover" data-title="Cover" data-logo="off" data-footer="off">
+  <div class="stage">
+    <div class="cover-mark" data-reveal></div>
+    <p class="eyebrow" data-reveal style="--d: 1">VIREO ARK · Product, Design and Engineering</p>
+    <h1 data-reveal style="--d: 2">The Next Version</h1>
+    <p class="lead" data-reveal style="--d: 3">Four pillars: a smart Exam Inbox, an interface that
+      looks finished, an experience shaped by role, one journey with MindBeat.</p>
+    <div class="cover-meta" data-reveal style="--d: 4">
+      <span><b>Date</b> 26 August 2026</span>
+      <span><b>Basis</b> Product audit on staging</span>
+    </div>
+  </div>
+</section>
+
+<!-- 02 · WHAT ALREADY STANDS -->
+<section class="slide t-cards" data-title="What already stands">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Where this starts</p>
+      <h2 data-reveal style="--d: 1">VIREO ARK already exists, and it already works.<br>This is the next layer, not a restart.</h2>
+    </div>
+    <div class="body">
+      <div class="grid-3">
+        <div class="card" data-reveal style="--d: 2">
+          <h4>The team built the platform</h4>
+          <p>Acquisition, archive, reporting, users and permissions, real time. Years of work by
+            this team, in the product today.</p>
+        </div>
+        <div class="card" data-reveal style="--d: 3">
+          <h4>And it is functional</h4>
+          <p>Real exams come in, get read and get reported on it every day. Everything shown from
+            here on was observed on a product that runs.</p>
+        </div>
+        <div class="card is-mark" data-reveal style="--d: 4">
+          <h4>So we start high</h4>
+          <p>Nothing in this pack asks for new foundations. It asks what the next version does with
+            the ones we have.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 5">The critique that follows is only possible because the base holds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · TODAY'S SCREEN -->
+<section class="slide t-list" data-title="Today's list">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Where we are</p>
+      <h2 data-reveal style="--d: 1">The work screen answers &ldquo;most recent&rdquo;,<br>not &ldquo;most critical&rdquo;</h2>
+    </div>
+    <div class="body">
+      <div class="mk2">
+        <div class="stack-sm">
+          <ul class="bullets">
+            <li data-reveal style="--d: 2">A chronological table of 14 columns, filtered to the last 7&nbsp;days.</li>
+            <li data-reveal style="--d: 3">STAT is <em>filterable</em> and appears in no column.</li>
+            <li data-reveal style="--d: 4">Four date columns, none for elapsed time.</li>
+          </ul>
+          <p class="note" data-reveal style="--d: 5">Product audit on staging, 26 Aug 2026</p>
+        </div>
+        <div data-reveal style="--d: 3">
+          <div class="mk" style="--cols: 1.4fr .92fr .6fr .8fr .8fr;">
+            <div class="mk-bar">
+              <span class="mk-dot"></span><span class="mk-name">Exams</span>
+              <span class="mk-right">Last 7 days · chronological</span>
+            </div>
+            <div class="mk-head">
+              <span>Patient</span><span>Received</span><span>ID</span><span>Status</span><span>Summary</span>
+            </div>
+            <div class="mk-row"><b>Almeida, R.</b><span class="mk-num">25/08 14:02</span><span class="mk-num">43971</span><span>Executed</span><span>Not defined</span></div>
+            <div class="mk-row"><b>Barros, M.</b><span class="mk-num">25/08 11:47</span><span class="mk-num">43968</span><span>Analysed</span><span>Normal</span></div>
+            <div class="mk-row"><b>Cardoso, J.</b><span class="mk-num">24/08 18:20</span><span class="mk-num">43963</span><span>Executed</span><span>Not defined</span></div>
+            <div class="mk-row"><b>Dias, P.</b><span class="mk-num">24/08 16:55</span><span class="mk-num">43961</span><span>Executed</span><span>Not defined</span></div>
+            <div class="mk-row"><b>Esteves, L.</b><span class="mk-num">24/08 09:31</span><span class="mk-num">43958</span><span>Analysed</span><span>Borderline</span></div>
+            <div class="mk-row"><b>Freitas, A.</b><span class="mk-num">23/08 20:14</span><span class="mk-num">43955</span><span>Executed</span><span>Not defined</span></div>
+          </div>
+          <p class="mk-cap">The list as observed on staging, 5 of its 14 columns.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · EXAM 43963 -->
+<section class="slide t-list" data-title="Exam 43963">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>The finding that sums up the product</p>
+      <h2 data-reveal style="--d: 1">The algorithm already knows this exam suggests infarction. The list tells no one.</h2>
+    </div>
+    <div class="body">
+      <div class="mk2 is-even is-top">
+        <div data-reveal style="--d: 2">
+          <p class="eyebrow">What the list shows</p>
+          <div class="mk" style="--cols: 1.3fr .8fr .9fr .9fr; margin-top: 12px;">
+            <div class="mk-head"><span>Patient</span><span>ID</span><span>Status</span><span>Summary</span></div>
+            <div class="mk-row"><b>Cardoso, J.</b><span class="mk-num">43963</span><span>Executed</span><span>Not defined</span></div>
+          </div>
+          <p class="mk-cap">No marker, no colour, indistinguishable from its neighbours.</p>
+        </div>
+        <div data-reveal style="--d: 4">
+          <p class="eyebrow">What the exam contains</p>
+          <div class="mk" style="margin-top: 12px;">
+            <div class="mk-bar"><span class="mk-dot"></span><span class="mk-name">Conclusions · exam 43963</span></div>
+            <div class="mk-origins" style="padding: 12px 14px;">
+              <svg class="mk-trace is-crit is-draw" viewBox="0 0 640 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7"/></svg>
+              <p class="mk-txt is-mono">*** ACUTE MI / ISCHEMIA ***<br>CONSIDER ACUTE INFARCTION<br>Summary: ABNORMAL ECG</p>
+            </div>
+          </div>
+          <p class="mk-cap">Automatic interpretation, in the conclusions field.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 5">Real exam from the staging archive</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · THE THESIS -->
+<section class="slide t-statement tone-primary" data-title="The thesis">
+  <div class="stage">
+    <p class="eyebrow" data-reveal>The thesis</p>
+    <h1 data-reveal style="--d: 1">The next version doesn&rsquo;t build new foundations.<br>It connects what is already built.</h1>
+    <p class="lead" data-reveal style="--d: 2">Card view components, the urgency flag, real time
+      infrastructure and a customisable role engine already exist and were never surfaced.</p>
+  </div>
+</section>
+
+<!-- 06 · THE FOUR PILLARS -->
+<section class="slide t-cards" data-title="The four pillars">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>The map</p>
+      <h2 data-reveal style="--d: 1">Four pillars, one product story</h2>
+    </div>
+    <div class="body">
+      <div class="grid-4">
+        <div class="card is-mark" data-reveal style="--d: 2">
+          <span class="tile is-solid">01</span>
+          <h3>Exam Inbox</h3>
+          <p>The product ranks the workload and says why, item by item.</p>
+        </div>
+        <div class="card" data-reveal style="--d: 3">
+          <span class="tile">02</span>
+          <h3>Interface consistency</h3>
+          <p>What we show has to look solid and finished.</p>
+        </div>
+        <div class="card" data-reveal style="--d: 4">
+          <span class="tile">03</span>
+          <h3>Roles and permissions</h3>
+          <p>Each user sees a system that fits their job.</p>
+        </div>
+        <div class="card" data-reveal style="--d: 5">
+          <span class="tile">04</span>
+          <h3>MindBeat integration</h3>
+          <p>One journey across two products.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 6">Pillar 02 gates the other three: without priority tokens in the
+        design system, the inbox invents colours that get redone on every screen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 07 · PILLAR 01 -->
+<section class="slide t-section tone-dark" data-title="Pillar 01">
+  <div class="stage">
+    <p class="sec-num">PILLAR 01</p>
+    <h1>Exam Inbox and smart prioritisation</h1>
+    <p class="lead">More than a list of exams: proof that VIREO ARK can organise a workload.</p>
+  </div>
+</section>
+
+<!-- 08 · THE INBOX -->
+<section class="slide t-list" data-title="The inbox">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>The initial screen</p>
+      <h2 data-reveal style="--d: 1">Three bands, and the reason each exam is in its band</h2>
+    </div>
+    <div class="body">
+      <div class="mk" data-reveal style="--d: 2">
+        <div class="mk-bar">
+          <span class="mk-dot"></span><span class="mk-name">Inbox · Dr. Marina Toledo</span>
+          <span class="mk-right">Scope: 4 sending sites</span>
+        </div>
+        <div class="mk-band is-crit" data-reveal style="--d: 3">
+          Needs attention <span class="mk-band-n">2 exams</span>
+        </div>
+        <div class="mk-cards" data-reveal style="--d: 4">
+          <div class="mk-card is-crit">
+            <svg class="mk-trace is-crit is-draw" viewBox="0 0 640 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7"/></svg>
+            <span class="mk-who">Cardoso, J. · 61</span>
+            <span class="mk-meta">Resting ECG · North ED · waiting 2 days</span>
+            <span class="mk-why">▲ Critical finding suggested by device interpretation</span>
+          </div>
+          <div class="mk-card is-crit">
+            <svg class="mk-trace is-crit is-draw" viewBox="0 0 640 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7"/></svg>
+            <span class="mk-who">Nunes, B. · 7 <span class="mk-tag is-ped">Paediatric</span></span>
+            <span class="mk-meta">ECG Holter · Vila Sul clinic · waiting 9 hours</span>
+            <span class="mk-why">▲ 3.4 s pause, MindBeat automatic analysis</span>
+          </div>
+        </div>
+        <div class="mk-band" data-reveal style="--d: 5">
+          My queue <span class="mk-band-n">18 exams</span>
+        </div>
+        <div data-reveal style="--d: 6; --cols: 1.3fr 1fr .85fr 1.1fr;">
+          <div class="mk-row"><b>Barros, M. · 54</b><span>Resting ECG</span><span class="mk-num">3 h</span><span><span class="mk-tag is-stat">STAT</span></span></div>
+          <div class="mk-row"><b>Dias, P. · 68</b><span>ABPM 24 h</span><span class="mk-num">1 day</span><span><span class="mk-tag is-ai">AI ready</span></span></div>
+          <div class="mk-row"><b>Esteves, L. · 45</b><span>Stress ECG</span><span class="mk-num">2 days</span><span><span class="mk-tag">Unassigned</span></span></div>
+        </div>
+        <div class="mk-band" data-reveal style="--d: 7">
+          Recently completed <span class="mk-band-n">6 · collapsed</span>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 8">Mock-up. The reason line is the field that does not exist today.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 09 · CRITERIA -->
+<section class="slide t-table" data-title="Prioritisation criteria">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>What drives the ranking</p>
+      <h2 data-reveal style="--d: 1">Most criteria run on data the product already holds</h2>
+    </div>
+    <div class="body is-top">
+      <div class="tbl-wrap" data-reveal style="--d: 2">
+        <table class="tbl">
+          <thead>
+            <tr><th>Criterion</th><th>Signal it reads</th><th>Data available today</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Marked STAT or urgent</td><td>Urgency flag set at source</td><td>Yes, filterable, never shown</td></tr>
+            <tr><td>Paediatric exam</td><td>Paediatric flag</td><td>Yes, already a badge</td></tr>
+            <tr><td>Waiting too long, or unassigned</td><td>Received time, status, reader field</td><td>Yes, 48 exams waiting today</td></tr>
+            <tr class="is-mark"><td>Relevant ECG changes</td><td>Severity markers in interpretation</td><td>Free text only, needs structuring</td></tr>
+            <tr class="is-mark"><td>Pacemaker present</td><td>Paced rhythm flag</td><td>Not observed, to confirm</td></tr>
+            <tr class="is-mark"><td>Acquisition failure</td><td>Lead off, analysable signal ratio</td><td>Not observed, to confirm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note" data-reveal style="--d: 3">The three highlighted rows need a technical answer first.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · CUSTOMISABLE WITH A FLOOR -->
+<section class="slide t-compare" data-title="Customisable with a floor">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Customisable, but not at any cost</p>
+      <h2 data-reveal style="--d: 1">Preference reorders the queue and never empties the critical band</h2>
+    </div>
+    <div class="body">
+      <div class="compare">
+        <div class="col" data-reveal style="--d: 2">
+          <div class="col-head">
+            <span class="pill is-quiet">Preference can</span>
+            <h3>Change order and emphasis</h3>
+          </div>
+          <ul class="bullets">
+            <li>Promote exam types and sending sites</li>
+            <li>Set the default sort of My queue</li>
+            <li>Flag exams into a personal view</li>
+            <li>Collapse the critical band, count stays visible</li>
+          </ul>
+        </div>
+        <div class="col is-mark" data-reveal style="--d: 3">
+          <div class="col-head">
+            <span class="pill is-solid">Preference cannot</span>
+            <h3>Remove a serious case</h3>
+          </div>
+          <ul class="bullets">
+            <li>Drop an exam that crossed a criterion</li>
+            <li>Hide a critical exam behind a filter</li>
+            <li>Switch the Needs attention band off</li>
+            <li>Lower priority because the AI called it normal</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 4">Every line on the right becomes a test case.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · PILLAR 02 -->
+<section class="slide t-section tone-dark" data-title="Pillar 02">
+  <div class="stage">
+    <p class="sec-num">PILLAR 02</p>
+    <h1>Interface refinement and consistency</h1>
+    <p class="lead">The most urgent of the four. Small defects add up to a product that does not look trustworthy.</p>
+  </div>
+</section>
+
+<!-- 12 · BEFORE / AFTER -->
+<section class="slide t-compare" data-title="Before and after">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>What changes in a single row</p>
+      <h2 data-reveal style="--d: 1">The row has to say urgency, waiting time and finding</h2>
+    </div>
+    <div class="body">
+      <div class="compare">
+        <div class="col" data-reveal style="--d: 2">
+          <div class="col-head">
+            <span class="pill is-quiet">Today</span>
+            <h3>Five fields, none decisive</h3>
+          </div>
+          <div class="mk" style="--cols: 1.2fr .95fr .75fr .85fr;">
+            <div class="mk-head"><span>Patient</span><span>Received</span><span>Status</span><span>Summary</span></div>
+            <div class="mk-row"><b>Cardoso, J.</b><span class="mk-num">24/08 18:20</span><span>Executed</span><span>Not defined</span></div>
+          </div>
+          <ul class="bullets">
+            <li>Urgency lives in the database, not on screen</li>
+            <li>Absolute date instead of waiting time</li>
+            <li>No trace preview</li>
+          </ul>
+        </div>
+        <div class="col is-mark" data-reveal style="--d: 3">
+          <div class="col-head">
+            <span class="pill is-solid">Next version</span>
+            <h3>The same data, made legible</h3>
+          </div>
+          <div class="mk" style="--cols: 1.2fr .95fr .75fr .85fr;">
+            <div class="mk-head"><span>Patient</span><span>Waiting</span><span>Trace</span><span>Signal</span></div>
+            <div class="mk-row">
+              <b>Cardoso, J.</b>
+              <span class="mk-num">2 days</span>
+              <svg class="mk-trace is-crit" viewBox="0 0 120 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7"/></svg>
+              <span><span class="mk-tag is-stat">STAT</span></span>
+            </div>
+          </div>
+          <ul class="bullets">
+            <li>Urgency token applied, not just filterable</li>
+            <li>Readable duration instead of a timestamp</li>
+            <li>The product&rsquo;s own card view, instantiated</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · INTERFACE DEBT -->
+<section class="slide t-list is-2col" data-title="Interface debt">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Scope of pillar 02</p>
+      <h2 data-reveal style="--d: 1">Ten systemic issues behind twenty-two visible ones</h2>
+    </div>
+    <div class="body">
+      <ul class="list">
+        <li data-reveal style="--d: 2">
+          <span class="tile is-solid">1</span>
+          <div class="li-body">
+            <h3>No priority or severity token</h3>
+            <p>Clinical severity has no visual expression. This gates pillar 01.</p>
+          </div>
+        </li>
+        <li data-reveal style="--d: 3">
+          <span class="tile">2</span>
+          <div class="li-body">
+            <h3>Line breaks and cramped headers</h3>
+            <p>Column titles on three lines, next to 500&nbsp;px of empty margin.</p>
+          </div>
+        </li>
+        <li data-reveal style="--d: 4">
+          <span class="tile">3</span>
+          <div class="li-body">
+            <h3>Icon-only actions with no name</h3>
+            <p>Plus an unlabelled toggle that changes how other controls behave.</p>
+          </div>
+        </li>
+        <li data-reveal style="--d: 5">
+          <span class="tile">4</span>
+          <div class="li-body">
+            <h3>No container or width rule</h3>
+            <p>Four screens crowd their content next to unused space.</p>
+          </div>
+        </li>
+        <li data-reveal style="--d: 6">
+          <span class="tile">5</span>
+          <div class="li-body">
+            <h3>Wrong weight on the destructive action</h3>
+            <p>The button that causes data loss is the loudest in the dialogue.</p>
+          </div>
+        </li>
+        <li data-reveal style="--d: 7">
+          <span class="tile">6</span>
+          <div class="li-body">
+            <h3>Localisation falls back to English</h3>
+            <p>Alongside three competing filter mechanisms on one screen.</p>
+          </div>
+        </li>
+      </ul>
+      <p class="note" data-reveal style="--d: 8">The design system exists and is in use. These are gaps in coverage
+        and in discipline, and that distinction decides who fixes what.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · PILLAR 03 -->
+<section class="slide t-section tone-dark" data-title="Pillar 03">
+  <div class="stage">
+    <p class="sec-num">PILLAR 03</p>
+    <h1>Roles, permissions and per-role experience</h1>
+    <p class="lead">Each type of user opens a system shaped to their job and their responsibility.</p>
+  </div>
+</section>
+
+<!-- 15 · THE ROLE ENGINE -->
+<section class="slide t-compare" data-title="The role engine">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Where we start from</p>
+      <h2 data-reveal style="--d: 1">The permission engine shipped. The experience it should produce did not.</h2>
+    </div>
+    <div class="body">
+      <div class="compare">
+        <div class="col" data-reveal style="--d: 2">
+          <div class="col-head">
+            <span class="pill is-quiet">Already built</span>
+            <h3>The mechanism</h3>
+          </div>
+          <ul class="bullets is-check">
+            <li>A Roles screen that lists and duplicates roles</li>
+            <li>A Users screen with a function per user</li>
+            <li>Fully customisable profile management, reported complete in 2025</li>
+            <li>Group and site hierarchy that scopes visibility</li>
+          </ul>
+        </div>
+        <div class="col is-mark" data-reveal style="--d: 3">
+          <div class="col-head">
+            <span class="pill is-solid">Still missing</span>
+            <h3>The effect on screen</h3>
+          </div>
+          <ul class="bullets">
+            <li>Every role opens the same empty initial screen</li>
+            <li>No dashboard tailored to a job</li>
+            <li>The menu shows every module regardless of relevance</li>
+            <li>Pre-set roles a customer could adopt on day one</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 4">The audit had a single profile, so the effect of each role could
+        not be observed. What is confirmed is that the mechanism exists.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 16 · FOUR ROLES, FOUR INITIAL SCREENS -->
+<section class="slide t-list" data-title="Four initial screens">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>The same product, four openings</p>
+      <h2 data-reveal style="--d: 1">Every role gets its own initial screen</h2>
+    </div>
+    <div class="body">
+      <div class="mk-roles">
+        <div class="mk-role" data-reveal style="--d: 2">
+          <div class="mk">
+            <div class="mk-mini">
+              <span class="mk-lbl">Department dashboard</span>
+              <div class="mk-kpis">
+                <div class="mk-kpi"><b>48</b><span>awaiting report</span></div>
+                <div class="mk-kpi"><b>3</b><span>past SLA</span></div>
+                <div class="mk-kpi"><b>12</b><span>unassigned</span></div>
+                <div class="mk-kpi"><b>96%</b><span>within target</span></div>
+              </div>
+              <span class="mk-line is-quiet"><i></i>Workload by site</span>
+            </div>
+          </div>
+          <span class="mk-role-name">Department manager</span>
+          <span class="mk-role-sub">Distribution, SLA and capacity. Reads no exams.</span>
+        </div>
+        <div class="mk-role" data-reveal style="--d: 3">
+          <div class="mk">
+            <div class="mk-mini">
+              <span class="mk-lbl">Exam Inbox</span>
+              <span class="mk-line"><i></i>Needs attention · 2</span>
+              <span class="mk-line is-quiet"><i></i>My queue · 18</span>
+              <span class="mk-line is-quiet"><i></i>Flagged by me · 4</span>
+              <svg class="mk-trace is-crit" viewBox="0 0 320 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7"/></svg>
+              <span class="mk-btn">Open first exam</span>
+            </div>
+          </div>
+          <span class="mk-role-name">Cardiologist</span>
+          <span class="mk-role-sub">Reads and signs. Order of work is the whole job.</span>
+        </div>
+        <div class="mk-role" data-reveal style="--d: 4">
+          <div class="mk">
+            <div class="mk-mini">
+              <span class="mk-lbl">Acquisition queue</span>
+              <span class="mk-line"><i></i>2 exams failed upload</span>
+              <span class="mk-line is-quiet"><i></i>Devices online · 14 of 16</span>
+              <span class="mk-line is-quiet"><i></i>Worklist today · 27</span>
+              <span class="mk-btn is-quiet">Retry upload</span>
+              <span class="mk-btn is-quiet">Check device</span>
+            </div>
+          </div>
+          <span class="mk-role-name">Technician</span>
+          <span class="mk-role-sub">Acquisition quality and devices. No reporting rights.</span>
+        </div>
+        <div class="mk-role" data-reveal style="--d: 5">
+          <div class="mk">
+            <div class="mk-mini">
+              <span class="mk-lbl">Send and track</span>
+              <span class="mk-btn">New exam</span>
+              <span class="mk-line"><i></i>Sent today · 6</span>
+              <span class="mk-line is-quiet"><i></i>Report ready · 4</span>
+              <span class="mk-line is-quiet"><i></i>In review · 2</span>
+            </div>
+          </div>
+          <span class="mk-role-name">Point-of-care operator</span>
+          <span class="mk-role-sub">One action, one status. Nothing else on screen.</span>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 6">Mock-up. Pre-set roles ship configured and stay customisable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 17 · WHAT A ROLE DEFINES -->
+<section class="slide t-table" data-title="What a role defines">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>One engine, many shapes</p>
+      <h2 data-reveal style="--d: 1">A role defines four things, and all four stay customisable</h2>
+    </div>
+    <div class="body is-top">
+      <div class="tbl-wrap" data-reveal style="--d: 2">
+        <table class="tbl">
+          <thead>
+            <tr><th>Role</th><th>Initial screen</th><th>Modules in the menu</th><th>Permissions</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Department manager</td><td>Operational dashboard</td><td>Reports, sites, users</td><td>Reassign and configure, no signing</td></tr>
+            <tr class="is-mark"><td>Cardiologist</td><td>Exam Inbox</td><td>Inbox, viewers, conclusions</td><td>Report and sign</td></tr>
+            <tr><td>Technician</td><td>Acquisition queue</td><td>Devices, worklist, upload</td><td>Acquire and resend, no reporting</td></tr>
+            <tr><td>Point-of-care operator</td><td>Send and track</td><td>New exam, status</td><td>Send and view own results</td></tr>
+            <tr><td>Administrator</td><td>System overview</td><td>Full menu</td><td>Configure everything, no clinical acts</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note" data-reveal style="--d: 3">These five ship pre-configured. Roles can be duplicated and edited.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 18 · PILLAR 04 -->
+<section class="slide t-section tone-dark" data-title="Pillar 04">
+  <div class="stage">
+    <p class="sec-num">PILLAR 04</p>
+    <h1>A seamless journey with MindBeat</h1>
+    <p class="lead">Not two products that talk to each other. One journey that happens to span two.</p>
+  </div>
+</section>
+
+<!-- 19 · THE JOURNEY -->
+<section class="slide t-steps" data-title="The journey">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>One journey, four steps</p>
+      <h2 data-reveal style="--d: 1">Out of VIREO ARK and back, with nothing re-entered</h2>
+    </div>
+    <div class="body">
+      <div class="steps">
+        <div class="step" data-reveal style="--d: 2">
+          <span class="tile">1</span>
+          <h3>The inbox flags it</h3>
+          <p>The Holter arrives carrying its analysis state: processing, ready, or unavailable.</p>
+        </div>
+        <div class="step" data-reveal style="--d: 3">
+          <span class="tile">2</span>
+          <h3>The summary is here</h3>
+          <p>Headline findings inside VIREO ARK, enough to triage without opening anything.</p>
+        </div>
+        <div class="step" data-reveal style="--d: 4">
+          <span class="tile is-solid">3</span>
+          <h3>One step into MindBeat</h3>
+          <p>Same patient, same exam, no second login.</p>
+        </div>
+        <div class="step" data-reveal style="--d: 5">
+          <span class="tile">4</span>
+          <h3>Back, already synced</h3>
+          <p>Findings and corrections return to the exam. Conclusion and signature close here.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 6">VIREO ARK does not rebuild the Holter viewer. Beat navigation,
+        artefact judgement and morphology grouping stay in MindBeat.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 20 · SYNCED, NOT MERGED -->
+<section class="slide t-list" data-title="Synced, not merged">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>The mechanism</p>
+      <h2 data-reveal style="--d: 1">Synced does not mean merged: three origins stay distinguishable</h2>
+    </div>
+    <div class="body">
+      <div class="mk2" data-reveal style="--d: 2">
+        <div class="stack-sm">
+          <p class="lead">Today the device interpretation and the human conclusion share the
+            <em>same editable field</em>.</p>
+          <ul class="bullets">
+            <li data-reveal style="--d: 3">During the audit, typing into it overwrote the algorithm&rsquo;s text,
+              including the infarction finding, with no warning and no history.</li>
+            <li data-reveal style="--d: 4">Syncing MindBeat output into that box would make an existing problem worse.</li>
+          </ul>
+          <p class="note" data-reveal style="--d: 5">Behaviour observed on staging</p>
+        </div>
+        <div data-reveal style="--d: 3">
+          <div class="mk">
+            <div class="mk-bar"><span class="mk-dot"></span><span class="mk-name">Report · Holter 43502</span></div>
+            <div class="mk-origins">
+              <div class="mk-origin is-device">
+                <span class="mk-src">Device interpretation <span class="mk-lock">Read only</span></span>
+                <p class="mk-txt is-mono">Sinus rhythm, frequent ventricular ectopy.</p>
+              </div>
+              <div class="mk-origin is-ai">
+                <span class="mk-src">MindBeat analysis · 25 Aug 08:12 <span class="mk-lock">Read only</span></span>
+                <p class="mk-burden">
+                  <span>Analysable <b>91%</b></span>
+                  <span>Sinus rhythm <b>96%</b></span>
+                  <span>Pauses <b>2</b></span>
+                  <span>Longest <b>3.4 s</b></span>
+                </p>
+                <p class="mk-txt">Findings <em>suggested</em> by automatic analysis. Agree · Disagree</p>
+              </div>
+              <div class="mk-origin is-human">
+                <span class="mk-src">Clinician conclusion <span class="mk-lock">Editable</span></span>
+                <p class="mk-ph">A report cannot be issued without text in this field.</p>
+              </div>
+            </div>
+          </div>
+          <p class="mk-cap">Mock-up. The AI block never pre-fills the clinician&rsquo;s field.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 · LAYERS OF FEASIBILITY -->
+<section class="slide t-cards" data-title="Layers of feasibility">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Honesty about scope</p>
+      <h2 data-reveal style="--d: 1">What reaches the stage now, and what needs an API contract</h2>
+    </div>
+    <div class="body">
+      <div class="grid-3">
+        <div class="card is-mark" data-reveal style="--d: 2">
+          <span class="tile is-solid">A</span>
+          <h3>Demonstrable now</h3>
+          <p>Analysis state indicator · summary panel from a real analysed exam · the three separated
+            origins · agree and disagree with a trail · the hand-off into MindBeat.</p>
+        </div>
+        <div class="card is-cool" data-reveal style="--d: 3">
+          <span class="tile">B</span>
+          <h3>Needs backend</h3>
+          <p>True per-exam analysis state · findings travelling both ways · persisted agreement ·
+            findings feeding the ranking · chained authentication.</p>
+        </div>
+        <div class="card is-alert" data-reveal style="--d: 4">
+          <span class="tile">C</span>
+          <h3>Deliberately out</h3>
+          <p>Rebuilding the Holter viewer · example strips per event · importing the derived report
+            into conclusions · an AI performance dashboard.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 5">Column C is not later. These are discard decisions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 22 · CLOSING -->
+<section class="slide t-end tone-dark" data-title="Closing" data-logo="off" data-footer="off">
+  <div class="stage">
+    <div class="end-mark"></div>
+    <h1>Four things, one story.</h1>
+    <p class="lead">The product knows what matters, shows it well, shows it to the right person,
+      and carries it across without a seam.</p>
+    <dl class="end-contact">
+      <div><dt>Pillar 01</dt><dd>An inbox that ranks the work and says why</dd></div>
+      <div><dt>Pillar 02</dt><dd>An interface that looks finished</dd></div>
+      <div><dt>Pillar 03</dt><dd>A system shaped to each role</dd></div>
+      <div><dt>Pillar 04</dt><dd>One journey with MindBeat</dd></div>
+    </dl>
+  </div>
+</section>
+
+</div><!-- /.deck -->
+
+<script src="deck.js"></script>
+</body>
+</html>
