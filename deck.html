@@ -756,34 +756,134 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 18 · WHAT A ROLE DEFINES -->
-<section class="slide t-table" data-title="What a role defines">
+<!-- 18 · THE PROPOSAL -->
+<section class="slide t-cards" data-title="One role per persona">
   <div class="stage">
     <div class="head">
-      <p class="eyebrow has-dash" data-reveal>One engine, many shapes</p>
-      <h2 data-reveal style="--d: 1">A role defines four things, and all four stay customisable</h2>
+      <p class="eyebrow has-dash" data-reveal>The proposal</p>
+      <h2 data-reveal style="--d: 1">One defined role per persona&nbsp;&mdash; applied automatically,<br>and still customisable</h2>
+    </div>
+    <div class="body">
+      <div class="grid-3">
+        <div class="card" data-reveal style="--d: 2">
+          <span class="tile">01</span>
+          <h3>Applied, not assembled</h3>
+          <p>Four roles ship configured. Creating an account means picking a persona, not walking
+            a permission grid one switch at a time.</p>
+        </div>
+        <div class="card" data-reveal style="--d: 3">
+          <span class="tile">02</span>
+          <h3>Customisable where it matters</h3>
+          <p>The engine stays open: a site adapts a role or builds its own. Pre-set is the default,
+            not a ceiling.</p>
+        </div>
+        <div class="card is-mark" data-reveal style="--d: 4">
+          <span class="tile is-solid">03</span>
+          <h3>A focused experience</h3>
+          <p>Each person opens the screen their work starts from, with only the modules that work
+            touches. One product, four coherent experiences.</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 5">This is an initial mapping &mdash; a prototype for the development
+        team to build on, not validated research. Items marked &ldquo;to validate&rdquo; need interviews or
+        a compliance decision.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 19 · THE FOUR PERSONAS -->
+<section class="slide t-cards" data-title="The four personas">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Who uses VIREO ARK</p>
+      <h2 data-reveal style="--d: 1">Four personas, and what each one is there to do</h2>
+    </div>
+    <div class="body">
+      <div class="grid-4">
+        <div class="card" data-reveal style="--d: 2">
+          <span class="tile">01</span>
+          <h3>Technician</h3>
+          <p>Operates the device and captures the exam in a fixed setting. Does not interpret it.
+            Hospital, primary care, emergency.</p>
+          <p class="mk-why">Values speed of sending and a clear status for every exam</p>
+        </div>
+        <div class="card" data-reveal style="--d: 3">
+          <span class="tile">02</span>
+          <h3>Point-of-care operator</h3>
+          <p>Captures in the field &mdash; home care, ambulance, mobile units &mdash; often on unstable
+            connectivity and with no local support.</p>
+          <p class="mk-why">Values delivery that holds up off-site, and proof it arrived</p>
+        </div>
+        <div class="card is-mark" data-reveal style="--d: 4">
+          <span class="tile is-solid">03</span>
+          <h3>Analysing physician</h3>
+          <p>Interprets the exam and signs the report. Overreading centres, private practice,
+            in-hospital reading.</p>
+          <p class="mk-why">Values reporting speed and AI as assistance, never replacement</p>
+        </div>
+        <div class="card" data-reveal style="--d: 5">
+          <span class="tile">04</span>
+          <h3>Department manager</h3>
+          <p>Supervises the operation of a centre, hospital or clinic network. Neither captures
+            nor signs.</p>
+          <p class="mk-why">Values seeing bottlenecks without opening exams one by one</p>
+        </div>
+      </div>
+      <p class="note" data-reveal style="--d: 6">To validate: whether the point-of-care operator is a persona of its
+        own or the technician on a mobile, low-connectivity interface. Treated separately here because
+        the context of use changes what the screen has to prioritise.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 20 · ACCESS MAP -->
+<section class="slide t-table" data-title="Access map">
+  <div class="stage">
+    <div class="head">
+      <p class="eyebrow has-dash" data-reveal>Persona &times; product layer</p>
+      <h2 data-reveal style="--d: 1">What each persona opens, does, and is measured by</h2>
     </div>
     <div class="body is-top">
       <div class="tbl-wrap" data-reveal style="--d: 2">
         <table class="tbl">
           <thead>
-            <tr><th>Role</th><th>Initial screen</th><th>Modules in the menu</th><th>Permissions</th></tr>
+            <tr>
+              <th>Persona</th><th>Core</th><th>Medical</th><th>Management</th>
+              <th>Initial page</th><th>Core action</th><th>Definition of success</th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td>Department manager</td><td>Operational dashboard</td><td>Reports, sites, users</td><td>Reassign and configure, no signing</td></tr>
-            <tr class="is-mark"><td>Cardiologist</td><td>Exam Inbox</td><td>Inbox, viewers, conclusions</td><td>Report and sign</td></tr>
-            <tr><td>Technician</td><td>Acquisition queue</td><td>Devices, worklist, upload</td><td>Acquire and resend, no reporting</td></tr>
-            <tr><td>Point-of-care operator</td><td>Send and track</td><td>New exam, status</td><td>Send and view own results</td></tr>
-            <tr><td>Administrator</td><td>System overview</td><td>Full menu</td><td>Configure everything, no clinical acts</td></tr>
+            <tr>
+              <td>Technician</td><td>Yes</td><td>No</td><td>No</td>
+              <td>Capture and send queue</td><td>Capture and send</td>
+              <td>Exam delivered, status visible without asking anyone</td>
+            </tr>
+            <tr>
+              <td>Point-of-care operator</td><td>Yes</td><td>No</td><td>No</td>
+              <td>Simplified field queue</td><td>Capture and sync</td>
+              <td>Confirmed arrival, even on intermittent connectivity</td>
+            </tr>
+            <tr class="is-mark">
+              <td>Analysing physician</td><td>Yes</td><td>Yes</td><td>No</td>
+              <td>Prioritised Exam Inbox</td><td>Read and sign</td>
+              <td>The right exam read first, reported faster</td>
+            </tr>
+            <tr>
+              <td>Department manager</td><td>Visibility</td><td>To&nbsp;validate</td><td>Yes</td>
+              <td>Metrics panel</td><td>Configure and supervise</td>
+              <td>Bottlenecks and SLA visible across the team</td>
+            </tr>
           </tbody>
         </table>
       </div>
-      <p class="note" data-reveal style="--d: 3">These five ship pre-configured. Roles can be duplicated and edited.</p>
+      <p class="note" data-reveal style="--d: 3">To validate with compliance: how far the manager can see individual
+        clinical data, given that they are not the professional responsible for the report. Who owns the
+        Inbox prioritisation and SLA rules is still to be confirmed.</p>
     </div>
   </div>
 </section>
 
-<!-- 19 · PILLAR 04 -->
+<!-- 21 · PILLAR 04 -->
 <section class="slide t-section tone-dark" data-title="Pillar 04">
   <div class="stage">
     <p class="sec-num">PILLAR 04</p>
@@ -792,7 +892,7 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 20 · THE JOURNEY -->
+<!-- 22 · THE JOURNEY -->
 <section class="slide t-steps" data-title="The journey">
   <div class="stage">
     <div class="head">
@@ -828,7 +928,7 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 21 · SYNCED, NOT MERGED -->
+<!-- 23 · SYNCED, NOT MERGED -->
 <section class="slide t-list" data-title="Synced, not merged">
   <div class="stage">
     <div class="head">
@@ -878,7 +978,7 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 22 · LAYERS OF FEASIBILITY -->
+<!-- 24 · LAYERS OF FEASIBILITY -->
 <section class="slide t-cards" data-title="Layers of feasibility">
   <div class="stage">
     <div class="head">
@@ -911,7 +1011,7 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 23 · CLOSING -->
+<!-- 25 · CLOSING -->
 <section class="slide t-end tone-dark" data-title="Closing" data-logo="off" data-footer="off">
   <div class="stage">
     <div class="end-mark"></div>

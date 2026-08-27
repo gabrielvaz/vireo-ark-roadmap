@@ -74,9 +74,17 @@ This is a good-news slide and should be delivered as one: the expensive half —
 
 This is the slide that makes the point without explanation. Walk left to right and say only what each person does first in their day. The permission model underneath is the same one; what changes is the opening.
 
-## What a role defines
+## One role per persona
 
-If asked whether this fragments the product: no. It is one permission model with a landing screen and a menu scope attached to it. The clinical floor from pillar 01 applies identically to every role.
+The sentence to land: today a role is assembled, in the proposal it is applied. Say plainly that this is an initial mapping and a prototype for development to build on — not validated research. That framing is what lets the room argue with it instead of receiving it.
+
+## The four personas
+
+Four personas today. If the room pushes on the point-of-care operator, that is the open question on the slide: separate persona or the technician on a mobile, low-connectivity interface. The context of use is the argument for keeping it separate.
+
+## Access map
+
+Two things on this table are questions, not statements: whether the manager can see individual clinical data (compliance and LGPD), and who owns the Inbox prioritisation and SLA rules. Say both out loud rather than letting someone find them in the cell.
 
 ## Pillar 04
 
