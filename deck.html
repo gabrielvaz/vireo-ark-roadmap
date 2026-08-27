@@ -930,5 +930,32 @@ body.capture .mk-card.is-crit,
 </div><!-- /.deck -->
 
 <script src="deck.js"></script>
+
+<script>
+/* Atalho exclusivo deste deck: R volta para o primeiro slide.
+   O motor não usa a tecla R, então basta um listener extra sobre a API pública
+   CardiolineDeck.go(). Ignora modificadores e campos de texto, como o motor. */
+(function () {
+  document.addEventListener("keydown", function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key !== "r" && e.key !== "R") return;
+    if (e.target && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    e.preventDefault();
+    var ov = document.querySelector(".overview.is-open");
+    var hp = document.querySelector(".help.is-open");
+    if (ov) ov.classList.remove("is-open");
+    if (hp) hp.classList.remove("is-open");
+    if (window.CardiolineDeck) window.CardiolineDeck.go(1);
+  });
+
+  /* mesma tecla listada no painel de atalhos (?) que o motor monta */
+  var dl = document.querySelector(".help-card dl");
+  if (dl) {
+    var dt = document.createElement("dt"); dt.textContent = "Back to the start";
+    var dd = document.createElement("dd"); dd.innerHTML = "<kbd>R</kbd>";
+    dl.appendChild(dt); dl.appendChild(dd);
+  }
+})();
+</script>
 </body>
 </html>
