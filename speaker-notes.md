@@ -6,9 +6,9 @@ Removidas do deck a pedido (a barra inferior do modo apresentador). Guardadas aq
 
 Open by naming the four pillars and saying they are one story, not four projects: the product knows what matters, shows it well, shows it to the right person, and carries it across into MindBeat without a seam.
 
-## What already stands
+## Where this starts
 
-Say the names if the room is the team itself. The point of this slide is that everything after it is critique of a product that works — the base is theirs, it runs in production, and none of the four pillars asks for it to be rebuilt. If it feels like a formality, it is not: it is what buys permission for slides three and four.
+Name the base before criticising it: the initial development is done and the software works. Everything after this slide is about the next version of it, not about starting over. If the room is the team itself, say the names.
 
 ## Today's list
 
@@ -21,6 +21,10 @@ The number that is not on the slide, if asked: 22 ECG Holters and 25 ABPM studie
 ## Exam 43963
 
 This is the slide that buys the room. Add nothing: show the row, wait, then show the panel. If asked why the Result field doesn’t solve it — it is filled by a human at reporting time, so ranking by it means ranking what is already done.
+
+## Roles today
+
+The engine is not the problem — the setup is. Ask how long it takes to onboard a new customer today, one permission at a time. The consequence to land: with no role applied, the user is handed every module in the product, and that is the opposite of a fluid first day.
 
 ## The thesis
 
