@@ -142,19 +142,32 @@ button { font: inherit; color: inherit; }
    .stage  → caixa fixa 1280x720, escalada por --scale
    ========================================================================= */
 .deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+/* `dvh` acompanha a barra de endereco do navegador movel; sem isto o palco
+   fica alto demais e o HUD escapa por baixo da tela no Chrome/Safari do celular. */
+@supports (height: 100dvh) { .deck { height: 100dvh; } }
 
-.slide { position: absolute; inset: 0; display: none; place-items: center; }
-.slide.is-active { display: grid; }
+.slide { position: absolute; inset: 0; display: none; }
+.slide.is-active { display: block; }
 
 .stage {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: var(--stage-w);
   height: var(--stage-h);
   flex: 0 0 auto;
   background: var(--c-bg);
   color: var(--c-ink);
   overflow: hidden;
-  transform: scale(var(--scale, 1));
+  /* Centralizacao por `translate`, nao pelo `place-items` do grid: quando o
+     palco (1280px) e mais largo que o viewport, o CSS Grid ancora o item no
+     inicio em vez de centralizar, e a origem do `scale` cai fora da tela --
+     abaixo de 1280px o slide era cortado, e no celular desaparecia por inteiro.
+     `--zoom` / `--pan-*` sao o zoom por toque, controlados em deck.js. */
+  transform:
+    translate(-50%, -50%)
+    translate(var(--pan-x, 0px), var(--pan-y, 0px))
+    scale(calc(var(--scale, 1) * var(--zoom, 1)));
   transform-origin: center center;
   padding: var(--pad-top) var(--pad-x) var(--pad-bot);
   display: grid;
@@ -869,13 +882,30 @@ strong { color: var(--c-ink); font-weight: 700; }
 }
 .ov-thumb {
   aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden;
-  background: #fff; border: 2px solid rgba(255,255,255,.14);
-  display: grid; place-items: center; position: relative;
+  background: #fff;
+  display: block; position: relative;
+  /* moldura como sombra interna, nao como `border`: a borda encolheria o
+     content-box e a miniatura de 16:9 nao fecharia mais com a caixa */
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.14);
 }
-.ov-item.is-current .ov-thumb { border-color: var(--c-primary); }
+.ov-item.is-current .ov-thumb { box-shadow: inset 0 0 0 2px var(--c-primary); }
 .ov-thumb .ov-mini {
-  width: 1280px; height: 720px; transform: scale(.164); transform-origin: center;
-  pointer-events: none; flex: 0 0 auto;
+  position: absolute; top: 0; left: 0;
+  width: 1280px; height: 720px;
+  /* Mesmo motivo do palco: com origem no centro, um bloco de 1280px numa caixa
+     de ~210px escapa da area visivel e a miniatura sai em branco. Ancorada no
+     canto, com `--ov-scale` medido em deck.js (largura real da thumb / 1280),
+     ela acompanha qualquer largura de coluna. */
+  transform: scale(var(--ov-scale, .164));
+  transform-origin: top left;
+  pointer-events: none;
+}
+/* O palco clonado nao repete a centralizacao por `translate`: dentro da
+   miniatura ele ja ocupa a caixa inteira de 1280x720. Sem isto o
+   `transform: none` do clone anula o `translate(-50%, -50%)` e o conteudo
+   desce para o quadrante inferior direito. */
+.ov-mini > .stage {
+  position: relative; left: auto; top: auto; transform: none;
 }
 .ov-meta { display: flex; gap: 8px; align-items: baseline; font-size: var(--fs-caption); color: rgba(255,255,255,.62); }
 .ov-meta b { color: #fff; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -915,6 +945,89 @@ strong { color: var(--c-ink); font-weight: 700; }
 .presenter .notes b, .presenter .notes strong { color: #fff; }
 
 /* ============================================================================
+   TOQUE E TELA PEQUENA
+   Nada aqui muda o deck no desktop com mouse: tudo esta atras de
+   `pointer: coarse` ou de uma largura de viewport de celular/tablet.
+   ========================================================================= */
+
+/* dica de zoom, so no primeiro slide de uma sessao em aparelho de toque */
+.zhint {
+  position: fixed; left: 50%; z-index: 61;
+  bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  padding: 9px 15px; border-radius: var(--radius-pill);
+  background: rgba(7, 16, 70, .88);
+  color: #fff; font-size: 12px; font-weight: 650; letter-spacing: .02em;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity .32s ease;
+}
+.zhint.is-on { opacity: 1; }
+@media (pointer: fine) { .zhint { display: none; } }
+/* Em paisagem de celular o slide ocupa quase toda a altura e nao sobra faixa
+   escura embaixo: a dica sobe para o topo, onde so ha o logo. */
+@media (max-height: 560px) {
+  .zhint { bottom: auto; top: calc(10px + env(safe-area-inset-top, 0px)); }
+}
+
+@media (pointer: coarse) {
+  /* o deck intercepta pinca e arrasto por conta propria (deck.js), entao o
+     navegador nao pode consumir o gesto antes */
+  .deck { touch-action: none; }
+
+  /* 44px e o alvo minimo confortavel para o dedo; o HUD tinha ~30px */
+  .hud { gap: 4px; padding: 5px; font-size: 15px; }
+  .hud button {
+    min-width: 44px; min-height: 44px;
+    display: grid; place-items: center;
+    padding: 0 12px; font-size: 17px;
+  }
+  .hud .hud-count {
+    min-height: 44px; min-width: 88px;
+    display: grid; place-items: center;
+    padding: 0 12px; font-size: 14px;
+  }
+  /* `:hover` fica preso depois do toque em touchscreen */
+  .hud button:hover, .hud .hud-count:hover { background: transparent; color: inherit; }
+  .hud button:active, .hud .hud-count:active { background: var(--c-tint-orange); color: var(--c-primary); }
+
+  .overview-head h4 { font-size: 16px; }
+  .ov-item { min-height: 44px; }
+}
+
+/* safe-area: barra de gestos do iPhone e a navegacao do Android */
+.hud {
+  right: max(20px, env(safe-area-inset-right, 0px));
+  bottom: max(18px, env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 700px) {
+  /* HUD centralizado: no canto direito de uma tela de 412px ele briga com o
+     polegar e com a barra de gestos */
+  .hud {
+    left: 50%; right: auto;
+    transform: translateX(-50%);
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .overview {
+    padding: 16px 14px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  /* duas colunas: varrer 26 slides numa coluna unica sao ~8 telas de rolagem */
+  .overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .overview-head { margin-bottom: 14px; }
+  .ov-meta { font-size: 11px; gap: 6px; }
+  .ov-thumb { border-radius: 8px; }
+
+  .help-card { margin: 16px; padding: 24px 22px; }
+  .help-card dl { grid-template-columns: 104px 1fr; }
+}
+
+/* paisagem baixa de celular: o overview em uma linha de miniaturas maiores */
+@media (max-width: 900px) and (orientation: landscape) {
+  .overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ============================================================================
    IMPRESSÃO / EXPORTAÇÃO
    Uma página por slide, exatamente 1280x720px, sem escala e sem HUD.
    ========================================================================= */
@@ -925,7 +1038,7 @@ strong { color: var(--c-ink); font-weight: 700; }
   body { font-size: var(--fs-body); }
   .deck { width: 1280px; height: auto; overflow: visible; }
   .slide, .slide.is-active {
-    display: grid !important;
+    display: block !important;
     position: relative; inset: auto;
     width: 1280px; height: 720px;
     page-break-inside: avoid; break-inside: avoid;
@@ -933,7 +1046,10 @@ strong { color: var(--c-ink); font-weight: 700; }
     overflow: hidden;
   }
   .slide:last-child { page-break-after: auto; break-after: auto; }
-  .stage { transform: none !important; width: 1280px; height: 720px; }
+  .stage {
+    position: relative; left: auto; top: auto;
+    transform: none !important; width: 1280px; height: 720px;
+  }
   .hud, .progress, .jump, .overview, .help, .notes { display: none !important; }
   /* `*` não casa pseudo-elementos: sem estas duas linhas o Chrome descarta
      fundos claros (o logo branco, entre outros) no modo de economia de tinta. */
@@ -944,8 +1060,10 @@ strong { color: var(--c-ink); font-weight: 700; }
 body.capture { overflow: visible; background: #fff; }
 body.capture .deck { width: 1280px; height: 720px; }
 body.capture .slide { display: none !important; }
-body.capture .slide.is-capture { display: grid !important; position: relative; inset: auto; }
-body.capture .stage { transform: none !important; }
+body.capture .slide.is-capture { display: block !important; position: relative; inset: auto; }
+body.capture .stage {
+  position: relative; left: auto; top: auto; transform: none !important;
+}
 body.capture .hud, body.capture .progress, body.capture .jump,
 body.capture .overview, body.capture .help, body.capture .notes { display: none !important; }
 
@@ -980,8 +1098,11 @@ body.capture .overview, body.capture .help, body.capture .notes { display: none 
 .cover-mark[data-reveal], .device[data-reveal] img { transform: none; }
 
 /* QA, export e impressão veem o slide inteiro, sem esperar animação. Sem isto o
-   PDF sai em branco e a folha de contato do qa.mjs mente. */
+   PDF sai em branco e a folha de contato do qa.mjs mente. O mesmo vale para as
+   miniaturas do overview: o clone nunca esta dentro de `.slide.is-active`, entao
+   sem esta linha a grade mostra so o logo e o rodape sobre um retangulo branco. */
 body.capture [data-reveal],
+.ov-mini [data-reveal],
 .slide.is-capture [data-reveal] {
   opacity: 1 !important; transform: none !important; transition: none !important;
 }

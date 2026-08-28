@@ -29,7 +29,8 @@
       kNext: "Próximo slide", kPrev: "Slide anterior", kEnds: "Primeiro / último",
       kJump: "Ir para o slide", kOverview: "Grade de slides", kNotes: "Notas do orador",
       kFull: "Tela cheia", kClose: "Fechar", prev: "Anterior", next: "Próximo",
-      restart: "Reiniciar", grid: "Grade"
+      restart: "Reiniciar", grid: "Grade",
+      zoomHint: "Toque duas vezes para ampliar \u00b7 arraste para navegar"
     },
     en: {
       of: "of", jumpLabel: "Go to slide", jumpHint: "Enter to confirm · Esc to cancel",
@@ -37,7 +38,8 @@
       kNext: "Next slide", kPrev: "Previous slide", kEnds: "First / last",
       kJump: "Go to slide", kOverview: "Slide grid", kNotes: "Speaker notes",
       kFull: "Full screen", kClose: "Close", prev: "Previous", next: "Next",
-      restart: "Restart", grid: "Grid"
+      restart: "Restart", grid: "Grid",
+      zoomHint: "Double-tap to zoom \u00b7 drag to pan"
     }
   };
 
@@ -139,15 +141,34 @@
   });
 
   /* ---------- escala ---------------------------------------------------- */
+  var baseScale = 1;
+
   function fit() {
     var w = deck.clientWidth, h = deck.clientHeight;
     var s = Math.min(w / STAGE_W, h / STAGE_H);
+    baseScale = s;
     document.documentElement.style.setProperty("--scale", String(s));
+    syncOvScale();
+    clampPan();
+    applyZoom();
+  }
+
+  /* A miniatura do overview e um palco de 1280px encaixado numa coluna da
+     grade. A escala tem de sair da largura real da caixa, medida depois do
+     layout -- um valor fixo no CSS quebra em qualquer largura de coluna
+     diferente da prevista. */
+  function syncOvScale() {
+    var first = ovGrid.firstElementChild;
+    var thumb = first && first.querySelector(".ov-thumb");
+    if (!thumb) return;
+    var w = thumb.clientWidth;
+    if (w > 0) ovGrid.style.setProperty("--ov-scale", String(w / STAGE_W));
   }
 
   /* ---------- navegação ------------------------------------------------- */
   function show(i, pushHash) {
     i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i !== idx) resetZoom();
     idx = i;
     slides.forEach(function (s, k) {
       s.classList.toggle("is-active", k === i);
@@ -183,6 +204,8 @@
     closeAll();
     buildOverview();
     overview.classList.add("is-open");
+    /* so agora a grade tem largura: `display: none` mede zero */
+    syncOvScale();
   }
   function toggleHelp() {
     var open = help.classList.contains("is-open");
@@ -199,7 +222,6 @@
       var thumb = el("div", "ov-thumb");
       var mini = el("div", "ov-mini");
       var clone = s.querySelector(".stage").cloneNode(true);
-      clone.style.transform = "none";
       mini.appendChild(clone);
       thumb.appendChild(mini);
       var title = s.getAttribute("data-title") || s.querySelector("h1, h2") ;
@@ -289,16 +311,164 @@
     if (k === "?" || k === "h" || k === "H") { e.preventDefault(); toggleHelp(); return; }
   });
 
+  /* ---------- zoom e arrasto por toque ---------------------------------- */
+  /* Num celular em retrato o palco encaixa na largura (412px de 1280px), e o
+     corpo de texto cai para ~6px. Duplo toque amplia no ponto tocado ate o
+     tamanho nativo, pinca ajusta a mao, e arrastar navega pelo slide. */
+
+  var ZOOM_MAX = 4;
+  var zoom = 1, panX = 0, panY = 0;
+
+  function nativeZoom() {
+    /* zoom que devolve o texto ao tamanho de projecao, sem passar do teto */
+    if (!(baseScale > 0)) return 2;
+    return Math.max(1.6, Math.min(ZOOM_MAX, 1 / baseScale));
+  }
+
+  function clampPan() {
+    /* o palco nunca desgruda das bordas: pan limitado ao excedente real */
+    var over = STAGE_W * baseScale * zoom - deck.clientWidth;
+    var overY = STAGE_H * baseScale * zoom - deck.clientHeight;
+    var mx = Math.max(0, over / 2), my = Math.max(0, overY / 2);
+    panX = Math.min(mx, Math.max(-mx, panX));
+    panY = Math.min(my, Math.max(-my, panY));
+  }
+
+  function applyZoom() {
+    var st = document.documentElement.style;
+    st.setProperty("--zoom", String(zoom));
+    st.setProperty("--pan-x", panX.toFixed(1) + "px");
+    st.setProperty("--pan-y", panY.toFixed(1) + "px");
+    document.body.classList.toggle("is-zoomed", zoom > 1.02);
+  }
+
+  function resetZoom() {
+    zoom = 1; panX = 0; panY = 0;
+    applyZoom();
+  }
+
+  /* Amplia mantendo fixo o ponto do palco que esta sob (fx, fy).
+     Na tela, um ponto p do palco cai em centro + pan + p*S. Igualando antes e
+     depois: pan1 = f - (f - pan0) * (z1 / z0). */
+  function setZoom(z, fx, fy) {
+    var z1 = Math.max(1, Math.min(ZOOM_MAX, z));
+    var z0 = zoom;
+    if (z1 === z0) return;
+    var cx = deck.clientWidth / 2, cy = deck.clientHeight / 2;
+    var f = { x: (fx == null ? cx : fx) - cx, y: (fy == null ? cy : fy) - cy };
+    var k = z1 / z0;
+    panX = f.x - (f.x - panX) * k;
+    panY = f.y - (f.y - panY) * k;
+    zoom = z1;
+    clampPan();
+    applyZoom();
+  }
+
   /* toque */
-  var tx = 0, ty = 0;
+  var coarse = false;
+  try { coarse = window.matchMedia("(pointer: coarse)").matches; } catch (e) { /* IE */ }
+
+  var tx = 0, ty = 0, tT = 0, panX0 = 0, panY0 = 0;
+  var pinching = false, dragging = false;
+  var pinchD0 = 0, pinchZ0 = 1, pinchFX = 0, pinchFY = 0;
+  var lastTapT = 0, lastTapX = 0, lastTapY = 0;
+
+  function touchDist(a, b) {
+    var dx = a.clientX - b.clientX, dy = a.clientY - b.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
   deck.addEventListener("touchstart", function (e) {
-    tx = e.changedTouches[0].clientX; ty = e.changedTouches[0].clientY;
+    if (e.touches.length >= 2) {
+      pinching = true; dragging = false;
+      pinchD0 = touchDist(e.touches[0], e.touches[1]);
+      pinchZ0 = zoom;
+      pinchFX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      pinchFY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      return;
+    }
+    var t0 = e.changedTouches[0];
+    tx = t0.clientX; ty = t0.clientY; tT = Date.now();
+    panX0 = panX; panY0 = panY;
+    dragging = zoom > 1.02;
   }, { passive: true });
+
+  deck.addEventListener("touchmove", function (e) {
+    if (pinching && e.touches.length >= 2) {
+      e.preventDefault();
+      var d = touchDist(e.touches[0], e.touches[1]);
+      if (pinchD0 > 0) setZoom(pinchZ0 * (d / pinchD0), pinchFX, pinchFY);
+      return;
+    }
+    if (dragging && e.touches.length === 1) {
+      e.preventDefault();
+      panX = panX0 + (e.touches[0].clientX - tx);
+      panY = panY0 + (e.touches[0].clientY - ty);
+      clampPan();
+      applyZoom();
+    }
+  }, { passive: false });
+
+  deck.addEventListener("touchcancel", function () {
+    pinching = false; dragging = false;
+  }, { passive: true });
+
   deck.addEventListener("touchend", function (e) {
-    var dx = e.changedTouches[0].clientX - tx;
-    var dy = e.changedTouches[0].clientY - ty;
-    if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.6) { dx < 0 ? next() : prev(); }
+    if (pinching) {
+      if (e.touches.length === 0) {
+        pinching = false;
+        if (zoom < 1.1) resetZoom();   /* pinca curta de volta: encaixa de novo */
+      }
+      return;
+    }
+
+    var ch = e.changedTouches[0];
+    var dx = ch.clientX - tx, dy = ch.clientY - ty;
+    var far = Math.sqrt(dx * dx + dy * dy);
+    var quick = Date.now() - tT < 260;
+
+    /* duplo toque: amplia no ponto tocado, ou volta ao encaixe */
+    if (quick && far < 14) {
+      var now = Date.now();
+      var near = Math.abs(ch.clientX - lastTapX) < 40 && Math.abs(ch.clientY - lastTapY) < 40;
+      if (now - lastTapT < 320 && near) {
+        lastTapT = 0;
+        hideZoomHint();
+        if (zoom > 1.02) resetZoom();
+        else setZoom(nativeZoom(), ch.clientX, ch.clientY);
+        return;
+      }
+      lastTapT = now; lastTapX = ch.clientX; lastTapY = ch.clientY;
+    }
+
+    if (dragging) { dragging = false; return; }
+
+    /* swipe: so quando encaixado, senao o arrasto e do zoom.
+       56px e 1.6:1 vinham de tela grande; num celular de 412px o gesto
+       raramente passava do limite. */
+    var TH = coarse ? 38 : 56;
+    var RATIO = coarse ? 1.15 : 1.6;
+    if (zoom <= 1.02 && Math.abs(dx) > TH && Math.abs(dx) > Math.abs(dy) * RATIO) {
+      hideZoomHint();
+      dx < 0 ? next() : prev();
+    }
   }, { passive: true });
+
+  /* ---------- dica de zoom (uma vez por sessao, so em aparelho de toque) -- */
+  var zhint = el("div", "zhint", escapeHtml(t.zoomHint));
+  document.body.appendChild(zhint);
+
+  function hideZoomHint() { zhint.classList.remove("is-on"); }
+
+  if (coarse) {
+    var seen = false;
+    try { seen = sessionStorage.getItem("deckZoomHint") === "1"; } catch (e) { /* modo privado */ }
+    if (!seen) {
+      try { sessionStorage.setItem("deckZoomHint", "1"); } catch (e) { /* idem */ }
+      setTimeout(function () { zhint.classList.add("is-on"); }, 900);
+      setTimeout(hideZoomHint, 5200);
+    }
+  }
 
   window.addEventListener("resize", fit);
   window.addEventListener("orientationchange", fit);
