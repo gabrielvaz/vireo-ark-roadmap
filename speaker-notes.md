@@ -30,6 +30,10 @@ The engine is not the problem — the setup is. Ask how long it takes to onboard
 
 The consequence is the answer to the cost objection, before anyone raises it: most of this work is composition and exposure, not foundation. Plant the sentence here and prove it near the end.
 
+## The name
+
+Say it plainly: Dolomiti is ours, not the market's. The product on the invoice stays VIREO ARK. The codename buys us one thing, a way to say "is Dolomiti ready" instead of listing four workstreams every time. If someone asks why a name at all, the answer is scheduling: four pillars land together or the story does not hold. The family is Trentino geography, so the next releases already have names waiting.
+
 ## The four pillars
 
 If the order gets debated, debate it here and not at the end. The point to defend: interface first is not designer preference, it is avoiding rework on every screen the inbox touches.
@@ -38,9 +42,9 @@ If the order gets debated, debate it here and not at the end. The point to defen
 
 Worth saying that the inbox is not a new idea: it sits in the company’s own competitive analysis and in the ARK macro-spec, flagged high priority, and never entered a planning cycle.
 
-## The inbox
+## The prioritised inbox
 
-Point at the reason line in orange at the foot of each card. Without it the ranking is a black box and no cardiologist trusts it. Ask the room: what else should be written on that line?
+One list, ranked, not a set of sections. Point at the reason line in orange at the foot of each card: urgency marked at source, signal variation, emergency origin, pacemaker. Without that line the ranking is a black box and no cardiologist trusts it. Ask the room: what else should be written on that line?
 
 ## Prioritisation criteria
 
@@ -60,7 +64,7 @@ Insist that none of this is new data: STAT, the received timestamp and the card-
 
 ## Interface debt
 
-Useful nuance for engineering: each finding is one of three kinds — the product contradicts the design system, the design system doesn’t cover the case, or it covers it and the product didn’t apply it. Only the second kind needs new design work.
+Do not turn this into a bug count. The point is the category: alignment, visual adjustment, interface refinement, transition flow. Useful nuance for engineering: each finding is one of three kinds, the product contradicts the design system, the design system does not cover the case, or it covers it and the product did not apply it. Only the second kind needs new design work.
 
 ## Pillar 03
 
@@ -98,9 +102,9 @@ The test of this pillar is a question the user should never have to ask: “wher
 
 For a technical room this is the important slide: the separation is not styling, it is what stops an inattentive edit from erasing the machine’s finding — and what makes it auditable who concluded what.
 
-## Layers of feasibility
+## Prototype and show and tell
 
-This is the ready answer to “are you going to demo something that doesn’t exist?”. Column A is everything the demo touches, and none of it depends on real integration.
+This is the deliverable slide. Read the sentence out loud, then open the prototype and walk the four pillars in that order: knows what matters, shows it clearly, to the right person, into MindBeat. The button on the slide opens the prototype, so it has to be pointed at the live link before the event.
 
 ## Effort
 

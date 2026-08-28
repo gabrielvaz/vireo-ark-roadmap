@@ -723,6 +723,40 @@ strong { color: var(--c-ink); font-weight: 700; }
 .t-quote .stage { align-content: center; }
 .t-quote .split-narrow { align-items: center; }
 
+/* Nota de rodapé do slide de abertura: de onde vem o codinome. */
+.why-name {
+  margin-top: 22px; max-width: 76ch;
+  font-size: var(--fs-small); color: var(--c-ink-58);
+}
+.why-name b { color: var(--c-ink); font-weight: 650; }
+
+/* 15b. batismo da versão ------------------------------------------------ */
+/* Slide de nome: a marca é o conteúdo, então ocupa a largura e o resto
+   recua para legenda. */
+.t-name .stage {
+  align-content: center; justify-items: center; text-align: center;
+  gap: 30px; padding: var(--pad-x) 96px;
+}
+.t-name .name-mark {
+  width: min(760px, 68%); aspect-ratio: 910 / 88;
+  background-image: url("assets/brand/dolomiti-navy.png");
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+}
+.t-name.tone-dark .name-mark, .t-name.tone-primary .name-mark {
+  background-image: url("assets/brand/dolomiti-white.png");
+}
+.t-name .lead { max-width: 58ch; text-align: center; }
+.t-name .name-note {
+  display: flex; gap: 46px; justify-content: center; flex-wrap: wrap;
+  margin-top: 4px; font-size: var(--fs-small);
+}
+.t-name .name-note > div { display: grid; gap: 3px; text-align: left; }
+.t-name .name-note dt {
+  font-size: var(--fs-caption); letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+.t-name .name-note dd { margin: 0; color: var(--c-on-dark); font-weight: 600; }
+
 /* 16. encerramento ---------------------------------------------------- */
 .t-end .stage { align-content: center; justify-items: start; gap: 24px; padding: var(--pad-x); }
 .t-end .end-mark {
@@ -732,6 +766,13 @@ strong { color: var(--c-ink); font-weight: 700; }
 }
 .t-end.tone-white .end-mark { background-image: var(--logo-orange); }
 .t-end h1 { max-width: 24ch; }
+/* Assinatura do codinome, repetida no encerramento. */
+.t-end .end-dolomiti {
+  width: 330px; aspect-ratio: 910 / 88; margin-top: 6px;
+  background-image: url("assets/brand/dolomiti-white.png");
+  background-repeat: no-repeat; background-position: left center; background-size: contain;
+}
+.t-end.tone-white .end-dolomiti { background-image: url("assets/brand/dolomiti-navy.png"); }
 .t-end .end-contact { display: flex; gap: 34px; font-size: var(--fs-small); }
 .t-end .end-contact > div { display: grid; gap: 3px; }
 .t-end .end-contact dt { font-size: var(--fs-caption); letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }

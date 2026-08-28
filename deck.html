@@ -97,6 +97,53 @@
 .mk-card .mk-who { font-size: 12.5px; font-weight: 650; color: var(--c-ink); }
 .mk-card .mk-meta { font-size: 10.5px; color: var(--c-ink-58); }
 .mk-why { font-size: 10px; font-weight: 750; letter-spacing: .03em; color: var(--c-primary-ink); }
+.mk-card { position: relative; }
+.mk-rank {
+  position: absolute; top: 9px; right: 11px;
+  font-size: 9.5px; font-weight: 800; letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--c-ink-58);
+}
+.mk-rank.is-crit { color: var(--c-primary-ink); }
+.mk-tag.is-pace { background: var(--c-tint-blue); color: var(--c-ink); }
+
+/* marcador quadrado no lugar do número, quando a lista não deve sugerir contagem */
+.tile.is-dot::before {
+  content: ""; width: 9px; height: 9px; border-radius: 2px;
+  background: var(--c-primary);
+}
+.tile.is-dot.is-solid::before { background: var(--c-on-dark); }
+
+/* ---- slide do entregável: frase em destaque + acesso ao protótipo ------ */
+.t-statement.is-deliverable .stage { gap: 18px; }
+.t-statement.is-deliverable h1 { font-size: 44px; max-width: 30ch; }
+.t-statement.is-deliverable .lead { max-width: 54ch; }
+
+.pillar-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+
+.cta-proto {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 6px;
+  padding: 14px 26px;
+  border-radius: var(--radius-pill);
+  background: var(--c-primary);
+  color: var(--c-on-dark);
+  font-size: var(--fs-caption);
+  font-weight: 750; letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: var(--shadow-card);
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+.cta-proto:hover, .cta-proto:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(238, 91, 0, .26);
+}
+.cta-proto .cta-arrow {
+  width: 7px; height: 7px;
+  border: solid currentColor; border-width: 2px 2px 0 0; border-radius: 1px;
+  transform: rotate(45deg);
+}
+.cta-note { font-size: var(--fs-caption); color: var(--c-ink-58); }
 
 .mk-origins { display: grid; gap: 9px; padding: 12px 14px; }
 .mk-origin {
@@ -231,6 +278,9 @@ body.capture .mk-card.is-crit,
             already standing.</p>
         </div>
       </div>
+      <p class="why-name" data-reveal style="--d: 5">We are calling it
+        <b>VIREO ARK &middot; Dolomiti</b> because that is the shape of this version: four distinct
+        peaks that only read as one range once you see them together.</p>
     </div>
   </div>
 </section>
@@ -312,7 +362,7 @@ body.capture .mk-card.is-crit,
   <div class="stage">
     <div class="head">
       <p class="eyebrow has-dash" data-reveal>Where we are</p>
-      <h2 data-reveal style="--d: 1">Roles exist, but each one is assembled by hand&nbsp;&mdash;<br>so a new user is handed the whole product</h2>
+      <h2 data-reveal style="--d: 1">Roles exist, but each one is assembled by hand,<br>so a new user is handed the whole product</h2>
     </div>
     <div class="body">
       <div class="mk2">
@@ -355,6 +405,19 @@ body.capture .mk-card.is-crit,
     <h1 data-reveal style="--d: 1">The next version doesn&rsquo;t build new foundations.<br>It connects what is already built.</h1>
     <p class="lead" data-reveal style="--d: 2">Card view components, the urgency flag, real time
       infrastructure and a customisable role engine already exist and were never surfaced.</p>
+  </div>
+</section>
+<section class="slide t-name tone-dark" data-title="The name" data-logo="off">
+  <div class="stage">
+    <p class="eyebrow" data-reveal>The next version has a name</p>
+    <div class="name-mark" data-reveal style="--d: 1"></div>
+    <p class="lead" data-reveal style="--d: 2">An internal codename, so the four pillars stop being
+      four separate asks and start being one project we can point at, plan and ship.</p>
+    <dl class="name-note" data-reveal style="--d: 3">
+      <div><dt>Used for</dt><dd>Internal planning and delivery</dd></div>
+      <div><dt>Product name</dt><dd>Stays VIREO ARK</dd></div>
+      <div><dt>Next in the family</dt><dd>Adige, Paganella, Brenta, Garda</dd></div>
+    </dl>
   </div>
 </section>
 
@@ -403,48 +466,54 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 09 · THE INBOX -->
-<section class="slide t-list" data-title="The inbox">
+<!-- 09 · THE PRIORITISED INBOX -->
+<section class="slide t-list" data-title="The prioritised inbox">
   <div class="stage">
     <div class="head">
       <p class="eyebrow has-dash" data-reveal>The initial screen</p>
-      <h2 data-reveal style="--d: 1">Three bands, and the reason each exam is in its band</h2>
+      <h2 data-reveal style="--d: 1">A prioritised inbox that puts the most urgent exam first,<br>and says why on every card</h2>
     </div>
     <div class="body">
       <div class="mk" data-reveal style="--d: 2">
         <div class="mk-bar">
-          <span class="mk-dot"></span><span class="mk-name">Inbox · Dr. Marina Toledo</span>
-          <span class="mk-right">Scope: 4 sending sites</span>
+          <span class="mk-dot"></span><span class="mk-name">Exam Inbox · Dr. Marina Toledo</span>
+          <span class="mk-right">26 exams · ranked by clinical urgency</span>
         </div>
-        <div class="mk-band is-crit" data-reveal style="--d: 3">
-          Needs attention <span class="mk-band-n">2 exams</span>
-        </div>
-        <div class="mk-cards" data-reveal style="--d: 4">
+        <div class="mk-cards" data-reveal style="--d: 3">
           <div class="mk-card is-crit">
+            <span class="mk-rank is-crit">01</span>
             <svg class="mk-trace is-crit is-draw" viewBox="0 0 640 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-16 l3,12 l2,-2 h4 q3,-6 6,0 h7"/></svg>
             <span class="mk-who">Cardoso, J. · 61</span>
             <span class="mk-meta">Resting ECG · North ED · waiting 2 days</span>
-            <span class="mk-why">▲ Critical finding suggested by device interpretation</span>
+            <span class="mk-why">▲ Emergency admission · critical finding suggested by device interpretation</span>
           </div>
           <div class="mk-card is-crit">
+            <span class="mk-rank is-crit">02</span>
             <svg class="mk-trace is-crit is-draw" viewBox="0 0 640 32" aria-hidden="true"><path d="M0,20 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7 h6 q2,-3 4,0 h3 l2,6 l3,-14 l3,10 l2,-2 h4 q3,-4 6,0 h7"/></svg>
             <span class="mk-who">Nunes, B. · 7 <span class="mk-tag is-ped">Paediatric</span></span>
             <span class="mk-meta">ECG Holter · Vila Sul clinic · waiting 9 hours</span>
-            <span class="mk-why">▲ 3.4 s pause, MindBeat automatic analysis</span>
+            <span class="mk-why">▲ Highest signal variation in the queue · 3.4 s pause, MindBeat automatic analysis</span>
+          </div>
+          <div class="mk-card">
+            <span class="mk-rank">03</span>
+            <span class="mk-who">Barros, M. · 54 <span class="mk-tag is-stat">STAT</span></span>
+            <span class="mk-meta">Resting ECG · North ED · waiting 3 hours</span>
+            <span class="mk-why">▲ Marked urgent at source, straight from the emergency department</span>
+          </div>
+          <div class="mk-card">
+            <span class="mk-rank">04</span>
+            <span class="mk-who">Rocha, T. · 73 <span class="mk-tag is-pace">Pacemaker</span></span>
+            <span class="mk-meta">ECG Holter · Centro clinic · waiting 1 day</span>
+            <span class="mk-why">▲ Paced rhythm: reading rules differ and the trace needs a human eye</span>
           </div>
         </div>
-        <div class="mk-band" data-reveal style="--d: 5">
-          My queue <span class="mk-band-n">18 exams</span>
-        </div>
-        <div data-reveal style="--d: 6; --cols: 1.3fr 1fr .85fr 1.1fr;">
-          <div class="mk-row"><b>Barros, M. · 54</b><span>Resting ECG</span><span class="mk-num">3 h</span><span><span class="mk-tag is-stat">STAT</span></span></div>
-          <div class="mk-row"><b>Dias, P. · 68</b><span>ABPM 24 h</span><span class="mk-num">1 day</span><span><span class="mk-tag is-ai">AI ready</span></span></div>
-          <div class="mk-row"><b>Esteves, L. · 45</b><span>Stress ECG</span><span class="mk-num">2 days</span><span><span class="mk-tag">Unassigned</span></span></div>
-        </div>
-        <div class="mk-band" data-reveal style="--d: 7">
-          Recently completed <span class="mk-band-n">6 · collapsed</span>
+        <div class="mk-band" data-reveal style="--d: 4">
+          The rest of the queue, in the same order
+          <span class="mk-band-n">22 exams</span>
         </div>
       </div>
+      <p class="note" data-reveal style="--d: 5">One list, ranked. Urgency, signal variation, emergency origin and pacemaker
+        are criteria, not sections, and each card carries the reason it sits where it sits.</p>
     </div>
   </div>
 </section>
@@ -577,55 +646,58 @@ body.capture .mk-card.is-crit,
   <div class="stage">
     <div class="head">
       <p class="eyebrow has-dash" data-reveal>Scope of pillar 02</p>
-      <h2 data-reveal style="--d: 1">Ten systemic issues behind twenty-two visible ones</h2>
+      <h2 data-reveal style="--d: 1">Systemic issues behind what the eye catches:<br>alignment, visual adjustment, refinement and flow</h2>
     </div>
     <div class="body">
       <ul class="list">
         <li data-reveal style="--d: 2">
-          <span class="tile is-solid">1</span>
+          <span class="tile is-dot is-solid"></span>
           <div class="li-body">
             <h3>No priority or severity token</h3>
             <p>Clinical severity has no visual expression. This gates pillar 01.</p>
           </div>
         </li>
         <li data-reveal style="--d: 3">
-          <span class="tile">2</span>
+          <span class="tile is-dot"></span>
           <div class="li-body">
-            <h3>Line breaks and cramped headers</h3>
-            <p>Column titles on three lines, next to 500&nbsp;px of empty margin.</p>
+            <h3>Alignment and spacing</h3>
+            <p>Column titles breaking onto three lines next to 500&nbsp;px of empty margin, and nothing
+              sitting on a shared grid.</p>
           </div>
         </li>
         <li data-reveal style="--d: 4">
-          <span class="tile">3</span>
+          <span class="tile is-dot"></span>
           <div class="li-body">
-            <h3>Icon-only actions with no name</h3>
-            <p>Plus an unlabelled toggle that changes how other controls behave.</p>
+            <h3>Visual adjustments across screens</h3>
+            <p>Icon-only actions with no name, an unlabelled toggle that changes how other controls
+              behave, competing filter mechanisms on one screen.</p>
           </div>
         </li>
         <li data-reveal style="--d: 5">
-          <span class="tile">4</span>
+          <span class="tile is-dot"></span>
           <div class="li-body">
             <h3>No container or width rule</h3>
-            <p>Four screens crowd their content next to unused space.</p>
+            <p>Screens crowd their content next to unused space, and the same page reads differently
+              on each monitor.</p>
           </div>
         </li>
         <li data-reveal style="--d: 6">
-          <span class="tile">5</span>
+          <span class="tile is-dot"></span>
           <div class="li-body">
-            <h3>Wrong weight on the destructive action</h3>
-            <p>The button that causes data loss is the loudest in the dialogue.</p>
+            <h3>Interface refinement</h3>
+            <p>The button that causes data loss is the loudest in the dialogue, and localisation
+              falls back to English mid-screen.</p>
           </div>
         </li>
         <li data-reveal style="--d: 7">
-          <span class="tile">6</span>
+          <span class="tile is-dot"></span>
           <div class="li-body">
-            <h3>Localisation falls back to English</h3>
-            <p>Alongside three competing filter mechanisms on one screen.</p>
+            <h3>Transition flow</h3>
+            <p>States swap without motion and navigation jumps, so nothing tells the eye what
+              changed or where it went.</p>
           </div>
         </li>
       </ul>
-      <p class="note" data-reveal style="--d: 8">The design system exists and is in use. These are gaps in coverage
-        and in discipline, and that distinction decides who fixes what.</p>
     </div>
   </div>
 </section>
@@ -753,7 +825,7 @@ body.capture .mk-card.is-crit,
   <div class="stage">
     <div class="head">
       <p class="eyebrow has-dash" data-reveal>The proposal</p>
-      <h2 data-reveal style="--d: 1">One defined role per persona&nbsp;&mdash; applied automatically,<br>and still customisable</h2>
+      <h2 data-reveal style="--d: 1">One defined role per persona, applied automatically<br>and still customisable</h2>
     </div>
     <div class="body">
       <div class="grid-3">
@@ -799,7 +871,7 @@ body.capture .mk-card.is-crit,
         <div class="card" data-reveal style="--d: 3">
           <span class="tile">02</span>
           <h3>Point-of-care operator</h3>
-          <p>Captures in the field &mdash; home care, ambulance, mobile units &mdash; often on unstable
+          <p>Captures in the field (home care, ambulance, mobile units), often on unstable
             connectivity and with no local support.</p>
           <p class="mk-why">Values delivery that holds up off-site, and proof it arrived</p>
         </div>
@@ -957,35 +1029,24 @@ body.capture .mk-card.is-crit,
   </div>
 </section>
 
-<!-- 24 · LAYERS OF FEASIBILITY -->
-<section class="slide t-cards" data-title="Layers of feasibility">
+<!-- 24 · PROTOTYPE AND SHOW AND TELL -->
+<section class="slide t-statement is-deliverable" data-title="Prototype and show and tell">
   <div class="stage">
-    <div class="head">
-      <p class="eyebrow has-dash" data-reveal>Honesty about scope</p>
-      <h2 data-reveal style="--d: 1">What reaches the stage now, and what needs an API contract</h2>
+    <p class="eyebrow" data-reveal>The deliverable · show and tell</p>
+    <h1 data-reveal style="--d: 1">We are taking to the event a VIREO ARK that knows what matters,
+      shows it clearly, to the right person, and carries it into MindBeat.</h1>
+    <p class="lead" data-reveal style="--d: 2">Not a description of a plan. A working prototype on
+      screen, walked through live, one pillar at a time.</p>
+    <div class="pillar-row" data-reveal style="--d: 3">
+      <span class="pill">Knows what matters</span>
+      <span class="pill">Shows it clearly</span>
+      <span class="pill">To the right person</span>
+      <span class="pill">Into MindBeat</span>
     </div>
-    <div class="body">
-      <div class="grid-3">
-        <div class="card is-mark" data-reveal style="--d: 2">
-          <span class="tile is-solid">A</span>
-          <h3>Demonstrable now</h3>
-          <p>Analysis state indicator · summary panel from a real analysed exam · the three separated
-            origins · agree and disagree with a trail · the hand-off into MindBeat.</p>
-        </div>
-        <div class="card is-cool" data-reveal style="--d: 3">
-          <span class="tile">B</span>
-          <h3>Needs backend</h3>
-          <p>True per-exam analysis state · findings travelling both ways · persisted agreement ·
-            findings feeding the ranking · chained authentication.</p>
-        </div>
-        <div class="card is-alert" data-reveal style="--d: 4">
-          <span class="tile">C</span>
-          <h3>Deliberately out</h3>
-          <p>Rebuilding the Holter viewer · example strips per event · importing the derived report
-            into conclusions · an AI performance dashboard.</p>
-        </div>
-      </div>
-    </div>
+    <a class="cta-proto" href="#" target="_blank" rel="noopener" data-reveal style="--d: 4">
+      Open the prototype<span class="cta-arrow" aria-hidden="true"></span>
+    </a>
+    <p class="cta-note" data-reveal style="--d: 5">Live demonstration, on the prototype, in this order.</p>
   </div>
 </section>
 
@@ -994,6 +1055,7 @@ body.capture .mk-card.is-crit,
   <div class="stage">
     <div class="end-mark"></div>
     <h1>Four pillars, one roadmap<br>to the next version.</h1>
+    <div class="end-dolomiti"></div>
     <p class="lead">This is what goes on stage: a product that ranks the work and says why, looks
       finished, fits the person who opens it, and carries the exam into MindBeat without a seam.</p>
     <dl class="end-contact">
